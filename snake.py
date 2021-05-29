@@ -17,6 +17,8 @@ velocity = 3
 def main():
     x = 50
     y = 50
+    x_change = 0
+    y_change = 0
     height = 20
     width = 20
     pg.init()
@@ -25,29 +27,40 @@ def main():
     clock.tick(60)
     pg.display.set_caption('Snake')
 
-    while True:
+    game = True
+
+    while game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
+            if event.type == pg.KEYDOWN:
+                keys = pg.key.get_pressed()
+                if event.key == pg.K_LEFT:
+                    x_change = -velocity
+                    y_change = 0
+                elif event.key == pg.K_RIGHT:
+                    x_change = velocity
+                    y_change = 0
+                elif event.key == pg.K_UP:
+                    y_change = -velocity
+                    x_change = 0
+                elif event.key == pg.K_DOWN:
+                    y_change = velocity
+                    x_change = 0  
 
-        keys = pg.key.get_pressed()
-        if x > 580 or x < 0 or y > 580 or y < 0:
-            gameOver(board)
-
-        if keys[pg.K_LEFT]:
-            x-=velocity
-        elif keys[pg.K_RIGHT]:
-            x+=velocity
-        elif keys[pg.K_UP]:
-            y-=velocity
-        elif keys[pg.K_DOWN]:
-            y+=velocity
-
+        y+=y_change
+        x+=x_change
         board.fill(bg_color)
+
         pg.draw.rect(board, (0, 0, 0), (x, y, height, width))
         clock.tick(60)
         pg.display.update()
+
+        if x > 580 or x < 0 or y > 580 or y < 0:
+            x_change = 0
+            y_change = 0
+            game = gameOver(board)
 
 
 def gameOver(board):
@@ -56,6 +69,8 @@ def gameOver(board):
         board.fill(game_over_color)
         board.blit(text, (200, 300))
         pg.display.update()
+        time.sleep(2)
+        return False
 
 if __name__ == "__main__":
     main()
