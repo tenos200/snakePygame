@@ -4,11 +4,17 @@ import time
 import sys
 import random
 
+#next to implement, collision with snake and boarders
+#conditions:
+#1. snake hits itself
+#2. snake hist a wall
+
 
 class Snake:
     def __init__(self):
         self.body = [v2(5, 10), v2(6, 10)]
         self.movement = v2(1, 0)
+        self.grow = False
 
     def draw_snake(self):
         for block in self.body:
@@ -16,12 +22,19 @@ class Snake:
             pg.draw.rect(board, (0, 0, 0), snake_rect)
 
     def move_snake(self):
-        copy_body = self.body[:-1]
-        copy_body.insert(0, copy_body[0] + self.movement)
-        self.body = copy_body
-    def grow(self):
+        if self.grow == True:
+            copy_body = self.body[:]
+            copy_body.insert(0, copy_body[0] + self.movement)
+            self.body = copy_body
+            self.grow = False
+        else:
+            copy_body = self.body[:-1]
+            copy_body.insert(0, copy_body[0] + self.movement)
+            self.body = copy_body
+
+    def grow_snake(self):
         #might have to change this method as it appends something outside the playing field
-        self.body.append(v2(-10,-10))
+        self.grow = True
 
 
 
@@ -47,17 +60,23 @@ class Main:
     def __init__(self):
         self.snake = Snake()
         self.food = Food()
+
     def update(self):
         self.snake.move_snake()
+    
     def draw_elements(self):
         self.snake.draw_snake()
         self.food.place_food()
+
     def check_position(self):
         if self.food.vector == self.snake.body[0]:
-            print("Yummy")
             self.food.new_position()
-            self.snake.grow()
+            self.snake.grow_snake()
 
+    def check_boundary(self):
+        #1. snake hits itself
+        #2. snake hist a wall
+        print("Test")
 
 
 
@@ -67,7 +86,6 @@ framerate = 60
 bg_color = (175, 215, 75)
 cell_size = 40 
 cell_number = 20
-window_width = 800 
 game = True
 board = pg.display.set_mode((cell_size * cell_number, cell_size * cell_number))
 pg.display.set_caption('Snake by Tenos200')
@@ -98,6 +116,7 @@ while game:
 
     board.fill(bg_color)
     game.draw_elements()
+    game.check_boundary()
     game.check_position()
     pg.display.update()
     clock.tick(framerate)
