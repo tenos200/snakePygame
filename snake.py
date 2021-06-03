@@ -19,18 +19,26 @@ class Snake:
         copy_body = self.body[:-1]
         copy_body.insert(0, copy_body[0] + self.movement)
         self.body = copy_body
+    def grow(self):
+        #might have to change this method as it appends something outside the playing field
+        self.body.append(v2(-10,-10))
+
 
 
 
 class Food:
     def __init__(self):
-        self.x = random.randint(0, cell_number - 1) 
-        self.y = random.randint(0, cell_number - 1) 
-        self.vector = v2(self.x, self.y)
+        self.new_position()
 
     def place_food(self):
         food_rect = pg.Rect(self.vector.x * cell_size, self.vector.y * cell_size, cell_size, cell_size)
         pg.draw.rect(board, (255, 0, 0), food_rect)
+
+    def new_position(self):
+        self.x = random.randint(0, cell_number - 1) 
+        self.y = random.randint(0, cell_number - 1) 
+        self.vector = v2(self.x, self.y)
+
 
 
 
@@ -46,10 +54,9 @@ class Main:
         self.food.place_food()
     def check_position(self):
         if self.food.vector == self.snake.body[0]:
-            print("Test")
-            self.food = Food()
-            #reposition the fruit
-            # add another block to the snake
+            print("Yummy")
+            self.food.new_position()
+            self.snake.grow()
 
 
 
