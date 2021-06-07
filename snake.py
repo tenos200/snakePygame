@@ -33,7 +33,6 @@ class Snake:
             self.body = copy_body
 
     def grow_snake(self):
-        #might have to change this method as it appends something outside the playing field
         self.grow = True
 
 
@@ -55,7 +54,6 @@ class Food:
 
 
 
-
 class Main:
     def __init__(self):
         self.snake = Snake()
@@ -63,6 +61,7 @@ class Main:
 
     def update(self):
         self.snake.move_snake()
+        self.check_boundary()
     
     def draw_elements(self):
         self.snake.draw_snake()
@@ -74,9 +73,12 @@ class Main:
             self.snake.grow_snake()
 
     def check_boundary(self):
-        #1. snake hits itself
-        #2. snake hist a wall
-        print("Test")
+        if (self.snake.body[0].x >= cell_number or self.snake.body[0].x < 0) or (self.snake.body[0].y >= 20 or self.snake.body[0].y < 0):
+            self.game_over()
+        #1. snake hits itself - Not done
+    def game_over(self):
+            pg.quit()
+            sys.exit()
 
 
 
@@ -93,7 +95,7 @@ pg.display.set_caption('Snake by Tenos200')
 
 
 SCREEN_UPDATE = pg.USEREVENT
-pg.time.set_timer(SCREEN_UPDATE, 150)
+pg.time.set_timer(SCREEN_UPDATE, 120)
 
 game = Main()
 
@@ -116,7 +118,6 @@ while game:
 
     board.fill(bg_color)
     game.draw_elements()
-    game.check_boundary()
     game.check_position()
     pg.display.update()
     clock.tick(framerate)
