@@ -4,21 +4,25 @@ import time
 import sys
 import random
 
-#next to implement, collision with snake and boarders
-#conditions:
-#1. snake hits itself
-#2. snake hist a wall
+#to do -
+#make sure that Snake cannot move right while moving left etc.
+#add game over screen
+#add score
+#add graphics to snake
+#add graphics to apple
 
 
 class Snake:
     def __init__(self):
-        self.body = [v2(5, 10), v2(6, 10)]
+        self.body = [v2(6, 10), v2(5, 10)]
         self.movement = v2(1, 0)
         self.grow = False
 
     def draw_snake(self):
         for block in self.body:
-            snake_rect = pg.Rect(block.x * cell_size, block.y * cell_size, cell_size, cell_size)
+            snake_rect = pg.Rect(block.x * cell_size, block.y * cell_size, 
+                    cell_size, cell_size)
+
             pg.draw.rect(board, (0, 0, 0), snake_rect)
 
     def move_snake(self):
@@ -43,7 +47,9 @@ class Food:
         self.new_position()
 
     def place_food(self):
-        food_rect = pg.Rect(self.vector.x * cell_size, self.vector.y * cell_size, cell_size, cell_size)
+        food_rect = pg.Rect(self.vector.x * cell_size, 
+                self.vector.y * cell_size, cell_size, cell_size)
+
         pg.draw.rect(board, (255, 0, 0), food_rect)
 
     def new_position(self):
@@ -73,9 +79,15 @@ class Main:
             self.snake.grow_snake()
 
     def check_boundary(self):
-        if (self.snake.body[0].x >= cell_number or self.snake.body[0].x < 0) or (self.snake.body[0].y >= 20 or self.snake.body[0].y < 0):
+        if (self.snake.body[0].x >= cell_number or self.snake.body[0].x < 0):
             self.game_over()
-        #1. snake hits itself - Not done
+        if (self.snake.body[0].y >= cell_number or self.snake.body[0].y < 0):
+            self.game_over()
+
+        for block in self.snake.body[1:]:
+            if block == self.snake.body[0]: 
+                self.game_over()
+
     def game_over(self):
             pg.quit()
             sys.exit()
