@@ -5,12 +5,8 @@ import sys
 import random
 
 #to do -
-#make sure that Snake cannot move right while moving left etc.
 #add game over screen
 #add score
-#add graphics to snake
-#add graphics to apple
-
 
 class Snake:
     def __init__(self):
@@ -18,12 +14,71 @@ class Snake:
         self.movement = v2(1, 0)
         self.grow = False
 
+        #grahpics from clear code tutorial
+
+        self.head_up = pg.image.load('graphics/head_up.png').convert_alpha()
+        self.head_down = pg.image.load('graphics/head_down.png').convert_alpha()
+        self.head_right = pg.image.load('graphics/head_right.png').convert_alpha()
+        self.head_left = pg.image.load('graphics/head_left.png').convert_alpha()
+
+        self.tail_up = pg.image.load('graphics/tail_up.png').convert_alpha()
+        self.tail_down = pg.image.load('graphics/tail_down.png').convert_alpha()
+        self.tail_right = pg.image.load('graphics/tail_right.png').convert_alpha()
+        self.tail_left = pg.image.load('graphics/tail_left.png').convert_alpha()
+
+        self.body_vertical = pg.image.load(
+                'graphics/body_vertical.png').convert_alpha()
+        self.body_horizontal = pg.image.load(
+                'graphics/body_horizontal.png').convert_alpha()
+
+        self.body_tr = pg.image.load('graphics/body_tr.png').convert_alpha()
+        self.body_tl = pg.image.load('graphics/body_tl.png').convert_alpha()
+        self.body_br = pg.image.load('graphics/body_br.png').convert_alpha()
+        self.body_bl = pg.image.load('graphics/body_bl.png').convert_alpha()
+
+
+
     def draw_snake(self):
-        for block in self.body:
+        self.update_head_graphics()
+        self.update_tail_grahpics()
+
+        for index, block in enumerate(self.body):
             snake_rect = pg.Rect(block.x * cell_size, block.y * cell_size, 
                     cell_size, cell_size)
-
             pg.draw.rect(board, (0, 0, 0), snake_rect)
+            if index == 0:
+                board.blit(self.head, snake_rect)
+            elif index == len(self.body) - 1:
+                board.blit(self.tail, snake_rect)
+            else:
+                previous_block = self.body[index + 1] - block
+                next_block = self.body[index - 1] - block
+
+                if previous_block.x == next_block.x:
+                    board.blit(self.body_vertical, snake_rect)
+                elif previous_block.y == next_block.y:
+                    board.blit(self.body_horizontal, snake_rect)
+                else:
+                    if previous_block.x == -1 and next_block.y == -1:
+                        board.blit(self.body_tl, snake_rect)
+                    if previous_block.y == -1 and next_block.x == -1:
+                        board.blit(self.body_tl, snake_rect)
+
+                    elif previous_block.x == -1 and next_block.y == 1:
+                        board.blit(self.body_bl, snake_rect)
+                    elif previous_block.y == 1 and next_block.x == -1:
+                        board.blit(self.body_bl, snake_rect)
+                    
+                    elif previous_block.x == 1 and next_block.y == -1:
+                        board.blit(self.body_tr, snake_rect)
+                    elif previous_block.y == -1 and next_block.x == 1:
+                        board.blit(self.body_tr, snake_rect)
+
+                    elif previous_block.x == 1 and next_block.y == 1:
+                        board.blit(self.body_br, snake_rect)
+                    elif previous_block.y == 1 and next_block.x == 1:
+                        board.blit(self.body_br, snake_rect)
+
 
     def move_snake(self):
         if self.grow == True:
@@ -35,6 +90,30 @@ class Snake:
             copy_body = self.body[:-1]
             copy_body.insert(0, copy_body[0] + self.movement)
             self.body = copy_body
+
+
+    def update_head_graphics(self):
+        head_relation = self.body[1] - self.body[0]
+        if head_relation == v2(1, 0):
+            self.head = self.head_left
+        elif head_relation == v2(-1, 0):
+            self.head = self.head_right
+        elif head_relation == v2(0, -1):
+            self.head = self.head_down
+        elif head_relation == v2(0, 1):
+            self.head = self.head_up
+
+    def update_tail_grahpics(self):
+        tail_relation = self.body[-2] - self.body[-1]
+        if tail_relation == v2(1, 0):
+            self.tail = self.tail_left
+        elif tail_relation == v2(-1, 0):
+            self.tail = self.tail_right
+        elif tail_relation == v2(0, -1):
+            self.tail = self.tail_down
+        elif tail_relation == v2(0, 1):
+            self.tail = self.tail_up
+
 
     def grow_snake(self):
         self.grow = True
@@ -50,7 +129,8 @@ class Food:
         food_rect = pg.Rect(self.vector.x * cell_size, 
                 self.vector.y * cell_size, cell_size, cell_size)
 
-        pg.draw.rect(board, (255, 0, 0), food_rect)
+        board.blit(apple_graphic, food_rect)
+        #pg.draw.rect(board, (255, 0, 0), food_rect)
 
     def new_position(self):
         self.x = random.randint(0, cell_number - 1) 
@@ -100,8 +180,9 @@ framerate = 60
 bg_color = (175, 215, 75)
 cell_size = 40 
 cell_number = 20
-game = True
+game_run = True
 board = pg.display.set_mode((cell_size * cell_number, cell_size * cell_number))
+apple_graphic = pg.image.load('graphics/apple.png').convert_alpha()
 pg.display.set_caption('Snake by Tenos200')
 
 
@@ -111,21 +192,25 @@ pg.time.set_timer(SCREEN_UPDATE, 120)
 
 game = Main()
 
-while game:
+while game_run:
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            game = False
+            game_run = False
         if event.type == SCREEN_UPDATE:
             game.update()
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_RIGHT:
-                game.snake.movement = (1, 0)
+                if game.snake.movement.x != -1:
+                    game.snake.movement = v2(1, 0)
             if event.key == pg.K_LEFT:
-                game.snake.movement = (-1, 0)
+                if game.snake.movement.x != 1:
+                    game.snake.movement = v2(-1, 0)
             if event.key == pg.K_UP:
-                game.snake.movement = (0, -1)
+                if game.snake.movement.y != 1:
+                    game.snake.movement = v2(0, -1)
             if event.key == pg.K_DOWN:
-                game.snake.movement = (0, 1)
+                if game.snake.movement.y != -1:
+                    game.snake.movement = v2(0, 1)
 
 
     board.fill(bg_color)
