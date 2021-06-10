@@ -5,6 +5,7 @@ import sys
 import random
 
 #to do -
+
 #improve speed of game over screen.
 #add menu
 #allow snake to travel outside the box
@@ -131,11 +132,13 @@ class Snake:
 class Food:
     def __init__(self):
         self.new_position()
+        self.apple_graphic = pg.image.load(
+                'graphics/apple.png').convert_alpha()
 
     def place_food(self):
         food_rect = pg.Rect(self.vector.x * cell_size, 
                 self.vector.y * cell_size, cell_size, cell_size)
-        board.blit(apple_graphic, food_rect)
+        board.blit(self.apple_graphic, food_rect)
 
     def new_position(self):
         self.x = random.randint(0, cell_number - 1) 
@@ -189,8 +192,6 @@ class Main:
                     if event.key == pg.K_q:
                         pg.quit()
                         sys.exit()
-                    if event.key == pg.K_r:
-                        self.game_over_menu = False 
             game_over_msg = (f'Game over! Score: {self.score}')
             self.display_message(game_over_msg)
             pg.display.update()
@@ -218,7 +219,6 @@ cell_size = 40
 cell_number = 20
 game_run = True
 board = pg.display.set_mode((cell_size * cell_number, cell_size * cell_number))
-apple_graphic = pg.image.load('graphics/apple.png').convert_alpha()
 pg.display.set_caption('Snake by Tenos200')
 
 
