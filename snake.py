@@ -5,8 +5,9 @@ import sys
 import random
 
 #to do -
-#add game over screen
-#add score
+#improve speed of game over screen.
+#add menu
+#allow snake to travel outside the box
 
 
 
