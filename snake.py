@@ -10,10 +10,10 @@ import random
 #allow snake to travel outside the box
 
 
-
 class Menu:
     def __init__(self):
         pass
+
 
 class Snake:
     def __init__(self):
@@ -164,6 +164,10 @@ class Main:
             self.snake.grow_snake()
             self.update_score()
 
+        for block in self.snake.body[1:]:
+            if block == self.food.vector:
+                self.food.place_food()
+
     def check_boundary(self):
         if (self.snake.body[0].x >= cell_number or self.snake.body[0].x < 0):
             self.game_over()
@@ -176,9 +180,8 @@ class Main:
 
     def game_over(self):
 
-        board.fill(game_over_color)
-        self.display_message()
-        pg.display.update()
+        game_over_msg = (f'Game over! Score: {self.score}')
+        self.display_message(game_over_msg)
 
         while self.game_over_menu:
             for event in pg.event.get():
@@ -187,19 +190,23 @@ class Main:
                         pg.quit()
                         sys.exit()
                     if event.key == pg.K_r:
-                        game_over_menu = False 
-
+                        self.game_over_menu = False 
+            game_over_msg = (f'Game over! Score: {self.score}')
+            self.display_message(game_over_msg)
+            pg.display.update()
 
     def update_score(self):
         self.score+=10
 
-    def display_message(self):
+    def display_message(self, message):
+        board.fill(game_over_color)
         font = pg.font.SysFont('timesnewroman', 32)
-        text = font.render(f'Game over! Score:{self.score}p', True, (255, 0, 0), 
-                (0, 0, 0))
+        text = font.render(message, True, 
+                (255, 0, 0), (0, 0, 0))
         textRect = text.get_rect()
         textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
         board.blit(text, textRect)
+        pg.display.update()
 
 
 pg.init()
@@ -247,4 +254,3 @@ while game_run:
     game.check_position()
     pg.display.update()
     clock.tick(framerate)
-    
