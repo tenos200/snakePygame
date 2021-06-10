@@ -8,6 +8,12 @@ import random
 #add game over screen
 #add score
 
+
+
+class Menu:
+    def __init__(self):
+        pass
+
 class Snake:
     def __init__(self):
         self.body = [v2(6, 10), v2(5, 10)]
@@ -128,9 +134,7 @@ class Food:
     def place_food(self):
         food_rect = pg.Rect(self.vector.x * cell_size, 
                 self.vector.y * cell_size, cell_size, cell_size)
-
         board.blit(apple_graphic, food_rect)
-        #pg.draw.rect(board, (255, 0, 0), food_rect)
 
     def new_position(self):
         self.x = random.randint(0, cell_number - 1) 
@@ -138,12 +142,12 @@ class Food:
         self.vector = v2(self.x, self.y)
 
 
-
-
 class Main:
     def __init__(self):
+        self.score = 0
         self.snake = Snake()
         self.food = Food()
+        self.game_over_menu = True
 
     def update(self):
         self.snake.move_snake()
@@ -157,6 +161,7 @@ class Main:
         if self.food.vector == self.snake.body[0]:
             self.food.new_position()
             self.snake.grow_snake()
+            self.update_score()
 
     def check_boundary(self):
         if (self.snake.body[0].x >= cell_number or self.snake.body[0].x < 0):
@@ -169,14 +174,37 @@ class Main:
                 self.game_over()
 
     def game_over(self):
-            pg.quit()
-            sys.exit()
 
+        board.fill(game_over_color)
+        self.display_message()
+        pg.display.update()
+
+        while self.game_over_menu:
+            for event in pg.event.get():
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_q:
+                        pg.quit()
+                        sys.exit()
+                    if event.key == pg.K_r:
+                        game_over_menu = False 
+
+
+    def update_score(self):
+        self.score+=10
+
+    def display_message(self):
+        font = pg.font.SysFont('timesnewroman', 32)
+        text = font.render(f'Game over! Score:{self.score}p', True, (255, 0, 0), 
+                (0, 0, 0))
+        textRect = text.get_rect()
+        textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
+        board.blit(text, textRect)
 
 
 pg.init()
 clock = pg.time.Clock()
 framerate = 60
+game_over_color = (0, 0, 0)
 bg_color = (175, 215, 75)
 cell_size = 40 
 cell_number = 20
