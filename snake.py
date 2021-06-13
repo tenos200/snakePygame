@@ -147,14 +147,14 @@ class Food:
 class Main:
     def __init__(self):
         pg.init()
+        self.board = pg.display.set_mode((cell_size * cell_number, 
+            cell_size * cell_number))
+        pg.display.set_caption('Snake by Tenos200')
         self.score = 0
         self.snake = Snake()
         self.food = Food()
         self.game_over_menu = True
         self.game_run = True
-        self.board = pg.display.set_mode((cell_size * cell_number, 
-            cell_size * cell_number))
-        pg.display.set_caption('Snake by Tenos200')
         SCREEN_UPDATE = pg.USEREVENT
         pg.time.set_timer(SCREEN_UPDATE, 120)
 
@@ -201,13 +201,13 @@ class Main:
         self.score = len(self.snake.body)
 
     def display_message(self, message):
-        board.fill(game_over_color)
+        self.board.fill(game_over_color)
         font = pg.font.SysFont('timesnewroman', 32)
         text = font.render(message, True, 
                 (255, 0, 0), (0, 0, 0))
         textRect = text.get_rect()
         textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
-        board.blit(text, textRect)
+        self.board.blit(text, textRect)
         pg.display.flip()
     
     def run(self):
@@ -237,18 +237,13 @@ class Main:
             clock.tick(framerate)
 
 
-pg.init()
 clock = pg.time.Clock()
 framerate = 60
 game_over_color = (0, 0, 0)
 bg_color = (175, 215, 75)
 cell_size = 40 
 cell_number = 20
-game_run = True
-board = pg.display.set_mode((cell_size * cell_number, cell_size * cell_number))
-pg.display.set_caption('Snake by Tenos200')
-SCREEN_UPDATE = pg.USEREVENT
-pg.time.set_timer(SCREEN_UPDATE, 120)
+
 
 game = Main()
 game.run()
