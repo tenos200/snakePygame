@@ -5,7 +5,7 @@ import sys
 import random
 
 #to do -
-#fix game over menu, and reset method on snake
+#finx the first time delay that happens when the user is trying to restart the game
 #add menu
 #allow snake to travel outside the box
 
@@ -125,6 +125,9 @@ class Snake:
     def reset(self):
         self.body = [v2(6, 10), v2(5, 10)]
         self.movement = v2(0, 0)
+        game = Main()
+        game.run()
+        
 
 
 class Food:
@@ -153,10 +156,10 @@ class Main:
         self.score = 0
         self.snake = Snake()
         self.food = Food()
-        self.game_over_menu = True
+        self.game_over_menu = False 
         self.game_run = True
-        SCREEN_UPDATE = pg.USEREVENT
-        pg.time.set_timer(SCREEN_UPDATE, 120)
+        self.SCREEN_UPDATE = pg.USEREVENT
+        pg.time.set_timer(self.SCREEN_UPDATE, 120)
 
     def update(self):
         self.snake.move_snake()
@@ -187,15 +190,9 @@ class Main:
                 self.game_over()
 
     def game_over(self):
-        while self.game_over_menu:
-            for event in pg.event.get():
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_q:
-                        pg.quit()
-                        sys.exit()
-            game_over_msg = (f'Game over! Score: {self.score}')
-            self.display_message(game_over_msg)
-            pg.display.flip()
+        self.game_over_menu = True
+        game_over_msg = (f'Game over! Score: {self.score}')
+        self.display_message(game_over_msg)
 
     def update_score(self):
         self.score = len(self.snake.body)
@@ -211,13 +208,21 @@ class Main:
         pg.display.flip()
     
     def run(self):
+
         while self.game_run:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.game_run = False
-                if event.type == SCREEN_UPDATE:
+                if event.type == self.SCREEN_UPDATE:
                     self.update()
                 if event.type == pg.KEYDOWN:
+                    if self.game_over_menu:
+                        if event.key == pg.K_q:
+                            pg.quit()
+                            sys.exit()
+                        if event.key == pg.K_r:
+                            self.game_over_menu = False
+                            self.snake.reset()
                     if event.key == pg.K_RIGHT:
                         if self.snake.movement.x != -1:
                             self.snake.movement = v2(1, 0)
@@ -230,9 +235,11 @@ class Main:
                     if event.key == pg.K_DOWN:
                         if self.snake.movement.y != -1:
                             self.snake.movement = v2(0, 1)
-            self.board.fill(bg_color)
-            self.draw_elements()
-            self.check_position()
+            
+            if not self.game_over_menu:
+                self.board.fill(bg_color)
+                self.draw_elements()
+                self.check_position()
             pg.display.update()
             clock.tick(framerate)
 
@@ -244,7 +251,5 @@ bg_color = (175, 215, 75)
 cell_size = 40 
 cell_number = 20
 
-
 game = Main()
 game.run()
-
