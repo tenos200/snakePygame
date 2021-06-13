@@ -5,16 +5,13 @@ import sys
 import random
 
 #to do -
-
-#improve speed of game over screen.
+#fix game over menu, and reset method on snake
 #add menu
 #allow snake to travel outside the box
-
 
 class Menu:
     def __init__(self):
         pass
-
 
 class Snake:
     def __init__(self):
@@ -46,7 +43,7 @@ class Snake:
 
 
 
-    def draw_snake(self):
+    def draw_snake(self, board):
         self.update_head_graphics()
         self.update_tail_grahpics()
 
@@ -122,11 +119,12 @@ class Snake:
         elif tail_relation == v2(0, 1):
             self.tail = self.tail_up
 
-
     def grow_snake(self):
         self.grow = True
 
-
+    def reset(self):
+        self.body = [v2(6, 10), v2(5, 10)]
+        self.movement = v2(0, 0)
 
 
 class Food:
@@ -135,7 +133,7 @@ class Food:
         self.apple_graphic = pg.image.load(
                 'graphics/apple.png').convert_alpha()
 
-    def place_food(self):
+    def place_food(self, board):
         food_rect = pg.Rect(self.vector.x * cell_size, 
                 self.vector.y * cell_size, cell_size, cell_size)
         board.blit(self.apple_graphic, food_rect)
@@ -148,18 +146,25 @@ class Food:
 
 class Main:
     def __init__(self):
+        pg.init()
         self.score = 0
         self.snake = Snake()
         self.food = Food()
         self.game_over_menu = True
+        self.game_run = True
+        self.board = pg.display.set_mode((cell_size * cell_number, 
+            cell_size * cell_number))
+        pg.display.set_caption('Snake by Tenos200')
+        SCREEN_UPDATE = pg.USEREVENT
+        pg.time.set_timer(SCREEN_UPDATE, 120)
 
     def update(self):
         self.snake.move_snake()
         self.check_boundary()
     
     def draw_elements(self):
-        self.snake.draw_snake()
-        self.food.place_food()
+        self.snake.draw_snake(self.board)
+        self.food.place_food(self.board)
 
     def check_position(self):
         if self.food.vector == self.snake.body[0]:
@@ -182,10 +187,6 @@ class Main:
                 self.game_over()
 
     def game_over(self):
-
-        game_over_msg = (f'Game over! Score: {self.score}')
-        self.display_message(game_over_msg)
-
         while self.game_over_menu:
             for event in pg.event.get():
                 if event.type == pg.KEYDOWN:
@@ -194,10 +195,10 @@ class Main:
                         sys.exit()
             game_over_msg = (f'Game over! Score: {self.score}')
             self.display_message(game_over_msg)
-            pg.display.update()
+            pg.display.flip()
 
     def update_score(self):
-        self.score+=10
+        self.score = len(self.snake.body)
 
     def display_message(self, message):
         board.fill(game_over_color)
@@ -207,7 +208,33 @@ class Main:
         textRect = text.get_rect()
         textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
         board.blit(text, textRect)
-        pg.display.update()
+        pg.display.flip()
+    
+    def run(self):
+        while self.game_run:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.game_run = False
+                if event.type == SCREEN_UPDATE:
+                    self.update()
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_RIGHT:
+                        if self.snake.movement.x != -1:
+                            self.snake.movement = v2(1, 0)
+                    if event.key == pg.K_LEFT:
+                        if self.snake.movement.x != 1:
+                            self.snake.movement = v2(-1, 0)
+                    if event.key == pg.K_UP:
+                        if self.snake.movement.y != 1:
+                            self.snake.movement = v2(0, -1)
+                    if event.key == pg.K_DOWN:
+                        if self.snake.movement.y != -1:
+                            self.snake.movement = v2(0, 1)
+            self.board.fill(bg_color)
+            self.draw_elements()
+            self.check_position()
+            pg.display.update()
+            clock.tick(framerate)
 
 
 pg.init()
@@ -220,37 +247,9 @@ cell_number = 20
 game_run = True
 board = pg.display.set_mode((cell_size * cell_number, cell_size * cell_number))
 pg.display.set_caption('Snake by Tenos200')
-
-
-
 SCREEN_UPDATE = pg.USEREVENT
 pg.time.set_timer(SCREEN_UPDATE, 120)
 
 game = Main()
+game.run()
 
-while game_run:
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            game_run = False
-        if event.type == SCREEN_UPDATE:
-            game.update()
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_RIGHT:
-                if game.snake.movement.x != -1:
-                    game.snake.movement = v2(1, 0)
-            if event.key == pg.K_LEFT:
-                if game.snake.movement.x != 1:
-                    game.snake.movement = v2(-1, 0)
-            if event.key == pg.K_UP:
-                if game.snake.movement.y != 1:
-                    game.snake.movement = v2(0, -1)
-            if event.key == pg.K_DOWN:
-                if game.snake.movement.y != -1:
-                    game.snake.movement = v2(0, 1)
-
-
-    board.fill(bg_color)
-    game.draw_elements()
-    game.check_position()
-    pg.display.update()
-    clock.tick(framerate)
