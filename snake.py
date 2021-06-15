@@ -43,7 +43,7 @@ class Snake:
 
 
 
-    def draw_snake(self, board):
+    def draw_snake(self):
         self.update_head_graphics()
         self.update_tail_grahpics()
 
@@ -136,7 +136,7 @@ class Food:
         self.apple_graphic = pg.image.load(
                 'graphics/apple.png').convert_alpha()
 
-    def place_food(self, board):
+    def place_food(self):
         food_rect = pg.Rect(self.vector.x * cell_size, 
                 self.vector.y * cell_size, cell_size, cell_size)
         board.blit(self.apple_graphic, food_rect)
@@ -163,8 +163,8 @@ class Main:
         self.check_boundary()
     
     def draw_elements(self):
-        self.snake.draw_snake(board)
-        self.food.place_food(board)
+        self.snake.draw_snake()
+        self.food.place_food()
 
     def check_position(self):
         if self.food.vector == self.snake.body[0]:
@@ -196,13 +196,14 @@ class Main:
 
     def display_message(self, message):
         #this method could be what is causing the issue investigate this further.
-        self.bg_color = self.game_over_color
+        board.fill(self.game_over_color)
         font = pg.font.SysFont('timesnewroman', 32)
         text = font.render(message, True, 
                 (255, 0, 0), (0, 0, 0))
         textRect = text.get_rect()
         textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
         board.blit(text, textRect)
+        pg.display.update()
     
     def run(self):
 
@@ -244,7 +245,6 @@ class Main:
 
 cell_size = 40 
 cell_number = 20
-        
 pg.init()
 board = pg.display.set_mode((cell_size * cell_number, 
     cell_size * cell_number))
