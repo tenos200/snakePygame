@@ -5,7 +5,7 @@ import sys
 import random
 
 #to do -
-#fix game over menu, and reset method on snake
+#fix game over menu speed
 #add menu
 #allow snake to travel outside the box
 
@@ -189,20 +189,27 @@ class Main:
     def game_over(self):
         self.game_over_menu = True
         game_over_msg = (f'Game over! Score: {self.score}')
-        self.display_message(game_over_msg)
+        game_over_msg2 = (f'Press R to play again or Q to quit')
+        self.display_message(game_over_msg, game_over_msg2)
 
     def update_score(self):
         self.score = len(self.snake.body)
 
-    def display_message(self, message):
+    def display_message(self, message, message2):
         #this method could be what is causing the issue investigate this further.
         board.fill(self.game_over_color)
         font = pg.font.SysFont('timesnewroman', 32)
         text = font.render(message, True, 
                 (255, 0, 0), (0, 0, 0))
+        text2 = font.render(message2, True, 
+                (255, 0, 0), (0, 0, 0))
         textRect = text.get_rect()
         textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
+        textRect2 = text.get_rect()
+        textRect2.midright= (cell_number*cell_size / 2 + 60, 
+                cell_number*cell_size / 2 + 100)
         board.blit(text, textRect)
+        board.blit(text2, textRect2)
         pg.display.update()
     
     def run(self):
