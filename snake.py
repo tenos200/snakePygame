@@ -202,7 +202,7 @@ class Main:
         textRect = text.get_rect()
         textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
         board.blit(text, textRect)
-        pg.display.flip()
+        pg.display.update()
     
     def run(self):
 
