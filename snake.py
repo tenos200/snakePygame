@@ -195,14 +195,14 @@ class Main:
         self.score = len(self.snake.body)
 
     def display_message(self, message):
-        board.fill(self.game_over_color)
+        #this method could be what is causing the issue investigate this further.
+        self.bg_color = self.game_over_color
         font = pg.font.SysFont('timesnewroman', 32)
         text = font.render(message, True, 
                 (255, 0, 0), (0, 0, 0))
         textRect = text.get_rect()
         textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
         board.blit(text, textRect)
-        pg.display.update()
     
     def run(self):
 
