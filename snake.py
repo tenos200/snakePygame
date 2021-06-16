@@ -5,13 +5,34 @@ import sys
 import random
 
 #to do -
-#fix game over menu speed
 #add menu
 #allow snake to travel outside the box
 
-class Menu:
-    def __init__(self):
-        pass
+
+#globals
+pg.init()
+cell_size = 40 
+cell_number = 20
+font = pg.font.SysFont('timesnewroman', 32)
+game_over_msg = f'Game over! Score: '
+game_over_msg2 = f'Press R to play again or Q to quit'
+text = font.render(game_over_msg, True, 
+        (255, 0, 0), (0, 0, 0))
+text2 = font.render(game_over_msg2, True, 
+        (255, 0, 0), (0, 0, 0))
+textRect = text.get_rect()
+textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
+textRect2 = text.get_rect()
+textRect2.midright= (cell_number*cell_size / 2 + 60, 
+        cell_number*cell_size / 2 + 100)
+board = pg.display.set_mode((cell_size * cell_number, 
+    cell_size * cell_number))
+pg.display.set_caption('Snake by Tenos200')
+clock = pg.time.Clock()
+SCREEN_UPDATE = pg.USEREVENT
+pg.time.set_timer(SCREEN_UPDATE, 120)
+
+
 
 class Snake:
     def __init__(self):
@@ -146,7 +167,6 @@ class Food:
         self.y = random.randint(0, cell_number - 1) 
         self.vector = v2(self.x, self.y)
 
-
 class Main:
     def __init__(self):
         self.framerate = 60
@@ -177,9 +197,9 @@ class Main:
                 self.food.place_food()
 
     def check_boundary(self):
-        if (self.snake.body[0].x >= cell_number or self.snake.body[0].x < 0):
+        if self.snake.body[0].x >= cell_number or self.snake.body[0].x < 0:
             self.game_over()
-        if (self.snake.body[0].y >= cell_number or self.snake.body[0].y < 0):
+        if self.snake.body[0].y >= cell_number or self.snake.body[0].y < 0:
             self.game_over()
 
         for block in self.snake.body[1:]:
@@ -188,29 +208,16 @@ class Main:
 
     def game_over(self):
         self.game_over_menu = True
-        game_over_msg = (f'Game over! Score: {self.score}')
-        game_over_msg2 = (f'Press R to play again or Q to quit')
-        self.display_message(game_over_msg, game_over_msg2)
+        self.display_message()
 
     def update_score(self):
         self.score = len(self.snake.body)
 
-    def display_message(self, message, message2):
+    def display_message(self):
         #this method could be what is causing the issue investigate this further.
         board.fill(self.game_over_color)
-        font = pg.font.SysFont('timesnewroman', 32)
-        text = font.render(message, True, 
-                (255, 0, 0), (0, 0, 0))
-        text2 = font.render(message2, True, 
-                (255, 0, 0), (0, 0, 0))
-        textRect = text.get_rect()
-        textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
-        textRect2 = text.get_rect()
-        textRect2.midright= (cell_number*cell_size / 2 + 60, 
-                cell_number*cell_size / 2 + 100)
         board.blit(text, textRect)
         board.blit(text2, textRect2)
-        pg.display.update()
     
     def run(self):
 
@@ -249,16 +256,6 @@ class Main:
 
             pg.display.update()
             clock.tick(self.framerate)
-
-cell_size = 40 
-cell_number = 20
-pg.init()
-board = pg.display.set_mode((cell_size * cell_number, 
-    cell_size * cell_number))
-pg.display.set_caption('Snake by Tenos200')
-clock = pg.time.Clock()
-SCREEN_UPDATE = pg.USEREVENT
-pg.time.set_timer(SCREEN_UPDATE, 120)
 
 game = Main()
 game.run()
