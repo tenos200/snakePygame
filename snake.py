@@ -6,7 +6,7 @@ import random
 
 #to do -
 #add menu
-#allow snake to travel outside the box
+#fix animation for when snake goes out of bound
 
 #globals
 pg.init()
