@@ -8,7 +8,6 @@ import random
 #add menu
 #allow snake to travel outside the box
 
-
 #globals
 pg.init()
 cell_size = 40 
@@ -197,10 +196,15 @@ class Main:
                 self.food.place_food()
 
     def check_boundary(self):
-        if self.snake.body[0].x >= cell_number or self.snake.body[0].x < 0:
-            self.game_over()
-        if self.snake.body[0].y >= cell_number or self.snake.body[0].y < 0:
-            self.game_over()
+        if self.snake.body[0].x >= cell_number:
+            self.snake.body[0].x = 0
+        if self.snake.body[0].x < 0:
+            self.snake.body[0].x = cell_number
+
+        if self.snake.body[0].y >= cell_number:
+            self.snake.body[0].y = 0
+        if self.snake.body[0].y < 0:
+            self.snake.body[0].y = cell_number
 
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]: 
