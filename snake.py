@@ -6,7 +6,7 @@ import random
 
 #to do -
 #add menu
-#fix animation for when snake goes out of bound
+#fix animation for body when snake goes out of bound
 #add score, allow high score to be stored and loaded
 
 #globals
