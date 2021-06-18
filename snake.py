@@ -30,18 +30,19 @@ board = pg.display.set_mode((cell_size * cell_number,
 pg.display.set_caption('Snake by Tenos200')
 clock = pg.time.Clock()
 SCREEN_UPDATE = pg.USEREVENT
-pg.time.set_timer(SCREEN_UPDATE, 120)
+speed = 120
+pg.time.set_timer(SCREEN_UPDATE, speed)
 
 
 
 class Snake:
+
     def __init__(self):
-        self.body = [v2(6, 10), v2(5, 10)]
+        self.body = [v2(6, 10), v2(5, 10), v2(4, 10)]
         self.movement = v2(1, 0)
         self.grow = False
 
         #grahpics from clear code tutorial
-
         self.head_up = pg.image.load('graphics/head_up.png').convert_alpha()
         self.head_down = pg.image.load('graphics/head_down.png').convert_alpha()
         self.head_right = pg.image.load('graphics/head_right.png').convert_alpha()
@@ -89,7 +90,7 @@ class Snake:
                         board.blit(self.body_tl, snake_rect)
                     if previous_block.y == -1 and next_block.x == -1:
                         board.blit(self.body_tl, snake_rect)
-
+                     
                     elif previous_block.x == -1 and next_block.y == 1:
                         board.blit(self.body_bl, snake_rect)
                     elif previous_block.y == 1 and next_block.x == -1:
@@ -120,7 +121,17 @@ class Snake:
 
     def update_head_graphics(self):
         head_relation = self.body[1] - self.body[0]
-        if head_relation == v2(1, 0):
+        #cases for once snake goes outside box and appears on other side
+        if head_relation == v2(-19, 0):
+            self.head = self.head_left
+        elif head_relation == v2(19, 0):
+            self.head = self.head_right
+        elif head_relation == v2(0, 19):
+            self.head = self.head_down
+        elif head_relation == v2(0, -19):
+            self.head = self.head_up
+
+        elif head_relation == v2(1, 0):
             self.head = self.head_left
         elif head_relation == v2(-1, 0):
             self.head = self.head_right
@@ -152,6 +163,7 @@ class Snake:
 
 
 class Food:
+
     def __init__(self):
         self.new_position()
         self.apple_graphic = pg.image.load(
@@ -167,7 +179,10 @@ class Food:
         self.y = random.randint(0, cell_number - 1) 
         self.vector = v2(self.x, self.y)
 
+
+
 class Main:
+
     def __init__(self):
         self.framerate = 60
         self.game_over_color = (0, 0, 0)
@@ -200,12 +215,12 @@ class Main:
         if self.snake.body[0].x >= cell_number:
             self.snake.body[0].x = 0
         if self.snake.body[0].x < 0:
-            self.snake.body[0].x = cell_number
+            self.snake.body[0].x = cell_number - 1
 
         if self.snake.body[0].y >= cell_number:
             self.snake.body[0].y = 0
         if self.snake.body[0].y < 0:
-            self.snake.body[0].y = cell_number
+            self.snake.body[0].y = cell_number - 1 
 
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]: 
@@ -219,7 +234,6 @@ class Main:
         self.score = len(self.snake.body)
 
     def display_message(self):
-        #this method could be what is causing the issue investigate this further.
         board.fill(self.game_over_color)
         board.blit(text, textRect)
         board.blit(text2, textRect2)
