@@ -91,16 +91,15 @@ class Snake:
                         board.blit(self.body_tl, snake_rect)
                     elif previous_block.y == -1 and next_block.x == -1:
                         board.blit(self.body_tl, snake_rect)
-                    elif previous_block.y == -19 and next_block.y == 1:
+                    elif previous_block.x == 19 and next_block.y == -1:
                         board.blit(self.body_tl, snake_rect)
 
-                    elif next_block.x == 0 and previous_block.y == 19:
-                        board.blit(self.body_tl, snake_rect)
-                        print('test')
 
                     elif previous_block.x == -1 and next_block.y == 1:
                         board.blit(self.body_bl, snake_rect)
                     elif previous_block.y == 1 and next_block.x == -1:
+                        board.blit(self.body_bl, snake_rect)
+                    elif previous_block.x == 19 and next_block.y == 1:
                         board.blit(self.body_bl, snake_rect)
                     
                     elif previous_block.x == 1 and next_block.y == -1:
