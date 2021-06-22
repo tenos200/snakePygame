@@ -6,7 +6,7 @@ import random
 
 #to do -
 #add menu
-#fix animation for tail when snake goes out of bound
+#fix case for animation when in top right and left screen
 #add score, allow high score to be stored and loaded
 
 #globals
@@ -86,7 +86,7 @@ class Snake:
                 elif previous_block.y == next_block.y:
                     board.blit(self.body_horizontal, snake_rect)
                 else:
-                    print(f'{previous_block.x} {previous_block.y} {next_block.x} {next_block.y}')
+                    #print(f'{previous_block.x} {previous_block.y} {next_block.x} {next_block.y}')
                     if previous_block.x == -1 and next_block.y == -1:
                         board.blit(self.body_tl, snake_rect)
                     elif previous_block.y == -1 and next_block.x == -1:
@@ -163,7 +163,6 @@ class Snake:
             self.head = self.head_down
         elif head_relation == v2(0, -19):
             self.head = self.head_up
-
         elif head_relation == v2(1, 0):
             self.head = self.head_left
         elif head_relation == v2(-1, 0):
@@ -173,9 +172,19 @@ class Snake:
         elif head_relation == v2(0, 1):
             self.head = self.head_up
 
+
     def update_tail_grahpics(self):
         tail_relation = self.body[-2] - self.body[-1]
-        if tail_relation == v2(1, 0):
+
+        if tail_relation == v2(0, 19):
+            self.tail = self.tail_down
+        elif tail_relation == v2(0, -19):
+            self.tail = self.tail_up
+        elif tail_relation == v2(19, 0):
+            self.tail = self.tail_right
+        elif tail_relation == v2(-19, 0):
+            self.tail = self.tail_left
+        elif tail_relation == v2(1, 0):
             self.tail = self.tail_left
         elif tail_relation == v2(-1, 0):
             self.tail = self.tail_right
