@@ -5,19 +5,23 @@ import sys
 import random
 
 #to do -
-#add menu
+#fix cursor in menu
+#fix so you can start from menu
 #fix case for animation when in top right and left screen
 #add score, allow high score to be stored and loaded
+#move globals to another render class now when game menu class is being implemented
 
-#globals
+#globals to render
 pg.init()
 cell_size = 40 
 cell_number = 20
 font = pg.font.SysFont('timesnewroman', 32)
-game_over_msg = f'Game over! Score: '
+font_menu = pg.font.SysFont('Raleway', 42, bold=True, italic=False)
+font_header = pg.font.SysFont('timesnewroman', 62, bold=True, italic=False)
+game_over_msg = f''
 game_over_msg2 = f'Press R to play again or Q to quit'
 text = font.render(game_over_msg, True, 
-        (255, 0, 0), (0, 0, 0))
+    (255, 0, 0), (0, 0, 0))
 text2 = font.render(game_over_msg2, True, 
         (255, 0, 0), (0, 0, 0))
 textRect = text.get_rect()
@@ -33,6 +37,67 @@ SCREEN_UPDATE = pg.USEREVENT
 speed = 120
 pg.time.set_timer(SCREEN_UPDATE, speed)
 
+
+class Menu:
+
+    def __init__(self):
+        self.cursor_x = cell_number*cell_size / 2 - 160
+        self.cursor_y = cell_number*cell_size / 2
+        self.move_down = 60
+        self.move_up = -60
+        self.game = Game()
+        self.menu_color = (175, 215, 75)
+        self.menu_text_color = (0, 0, 0)
+        self.menu_text = 'Main Menu'
+        self.play_text = 'Play'
+        self.leaderboard_text = 'Leaderboard'
+        self.help_text = 'Help'
+        self.credits_text = 'Credits'
+        self.mid = cell_number*cell_size / 2
+        self.menu_cursor = font_menu.render('>', True, (0, 0, 0), self.menu_color)
+        self.cursor_rect = self.menu_cursor.get_rect()
+        self.cursor_rect.center = (self.cursor_x, 
+                self.cursor_y)
+
+    def menu_run(self):
+
+        while True:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_UP:
+                        self.cursor_y+=self.move_up
+                    elif event.key == pg.K_DOWN:
+                        self.cursor_y+=self.move_down
+
+            self.draw_elements()
+            self.draw_cursor()
+            pg.display.update()
+
+
+    def draw_cursor(self):
+        self.draw_text(">", 'Raleway', True, 42, self.cursor_x, self.cursor_y)
+
+    def draw_text(self, text, font_type, bold, size, x, y):
+        fonts = pg.font.SysFont(font_type, size, bold, italic=False)
+        display = fonts.render(text, True, (0, 0, 0), 
+                self.menu_color)
+        display_rect  = display.get_rect()
+        display_rect.center = (x, y)
+        board.blit(display, display_rect)
+
+    def draw_elements(self):
+            board.fill(self.menu_color)
+            self.draw_text(self.menu_text,'timesnewroman', True, 62, self.mid,
+                    self.mid - 180)
+            self.draw_text(self.play_text,'Raleway', True, 42, 
+                    self.mid, self.mid)
+            self.draw_text(self.leaderboard_text,'Raleway', True, 42, 
+                self.mid, self.mid + 60)
+            self.draw_text(self.help_text,'Raleway', True, 42, 
+                self.mid, self.mid + 120)
 
 
 class Snake:
@@ -86,7 +151,8 @@ class Snake:
                 elif previous_block.y == next_block.y:
                     board.blit(self.body_horizontal, snake_rect)
                 else:
-                    #print(f'{previous_block.x} {previous_block.y} {next_block.x} {next_block.y}')
+                    #print(f'{previous_block.x} 
+                    #{previous_block.y} {next_block.x} {next_block.y}')
                     if previous_block.x == -1 and next_block.y == -1:
                         board.blit(self.body_tl, snake_rect)
                     elif previous_block.y == -1 and next_block.x == -1:
@@ -199,7 +265,7 @@ class Snake:
     def reset(self):
         self.body = [v2(6, 10), v2(5, 10)]
         self.movement = v2(0, 0)
-        game = Main()
+        game = Game()
         game.run()
         
 
@@ -223,7 +289,7 @@ class Food:
 
 
 
-class Main:
+class Game:
 
     def __init__(self):
         self.framerate = 60
@@ -273,12 +339,16 @@ class Main:
         self.display_message()
 
     def update_score(self):
-        self.score = len(self.snake.body)
+        self.score+=1
 
     def display_message(self):
+        game_over_msg = f'Game over! Score: {self.score}'
+        text = font.render(game_over_msg, True, 
+            (255, 0, 0), (0, 0, 0))
         board.fill(self.game_over_color)
         board.blit(text, textRect)
         board.blit(text2, textRect2)
+        self.score = 0
     
     def run(self):
 
@@ -318,5 +388,5 @@ class Main:
             pg.display.update()
             clock.tick(self.framerate)
 
-game = Main()
-game.run()
+menu = Menu()
+menu.menu_run()
