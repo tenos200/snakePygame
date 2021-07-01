@@ -5,6 +5,8 @@ import sys
 import random
 
 #to do -
+#fix bug where you can exit game and get back to menu but not enter game again
+#fix uncentered text in game over menu
 #fix cursor in menu
 #fix so you can start from menu
 #fix case for animation when in top right and left screen
@@ -43,6 +45,9 @@ class Menu:
     def __init__(self):
         self.cursor_x = cell_number*cell_size / 2 - 160
         self.cursor_y = cell_number*cell_size / 2
+        self.top_cursor = cell_number*cell_size / 2  
+        self.bottom_cursor = cell_number*cell_size / 2 + 120
+        self.mid_cursor = cell_number*cell_size / 2 + 60
         self.move_down = 60
         self.move_up = -60
         self.game = Game()
@@ -67,10 +72,26 @@ class Menu:
                     pg.quit()
                     sys.exit()
                 elif event.type == pg.KEYDOWN:
-                    if event.key == pg.K_UP:
-                        self.cursor_y+=self.move_up
+
+                    if event.key == pg.K_RETURN:
+                        if self.cursor_y == self.top_cursor:
+                            self.game.run()
+                        elif self.cursor_y == self.mid_cursor:
+                            #add feature here
+                            print('leaderboard')
+                        elif self.cursor_y == self.bottom_cursor:
+                            #add feature here
+                            print('Help')
+                    elif event.key == pg.K_UP:
+                        if self.cursor_y == self.top_cursor:
+                            self.cursor_y = self.bottom_cursor
+                        else:
+                            self.cursor_y+=self.move_up
                     elif event.key == pg.K_DOWN:
-                        self.cursor_y+=self.move_down
+                        if self.cursor_y == self.bottom_cursor:
+                            self.cursor_y = self.top_cursor
+                        else:
+                            self.cursor_y+=self.move_down
 
             self.draw_elements()
             self.draw_cursor()
@@ -361,12 +382,10 @@ class Game:
                 if event.type == pg.KEYDOWN:
                     if self.game_over_menu:
                         if event.key == pg.K_q:
-                            pg.quit()
-                            sys.exit()
+                            self.game_run = False
                         if event.key == pg.K_r:
                             self.game_over_menu = False
                             self.snake.reset()
-                            del self
                     if event.key == pg.K_RIGHT:
                         if self.snake.movement.x != -1:
                             self.snake.movement = v2(1, 0)
