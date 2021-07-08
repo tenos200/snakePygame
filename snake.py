@@ -5,10 +5,7 @@ import sys
 import random
 
 #to do -
-#fix bug where you can exit game and get back to menu but not enter game again
 #fix uncentered text in game over menu
-#fix cursor in menu
-#fix so you can start from menu
 #fix case for animation when in top right and left screen
 #add score, allow high score to be stored and loaded
 #move globals to another render class now when game menu class is being implemented
@@ -28,8 +25,8 @@ text2 = font.render(game_over_msg2, True,
         (255, 0, 0), (0, 0, 0))
 textRect = text.get_rect()
 textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
-textRect2 = text.get_rect()
-textRect2.midright= (cell_number*cell_size / 2 + 60, 
+textRect2 = text2.get_rect()
+textRect2.midright = (cell_number*cell_size / 2 + 60, 
         cell_number*cell_size / 2 + 100)
 board = pg.display.set_mode((cell_size * cell_number, 
     cell_size * cell_number))
@@ -50,7 +47,6 @@ class Menu:
         self.mid_cursor = cell_number*cell_size / 2 + 60
         self.move_down = 60
         self.move_up = -60
-        self.game = Game()
         self.menu_color = (175, 215, 75)
         self.menu_text_color = (0, 0, 0)
         self.menu_text = 'Main Menu'
@@ -75,7 +71,8 @@ class Menu:
 
                     if event.key == pg.K_RETURN:
                         if self.cursor_y == self.top_cursor:
-                            self.game.run()
+                            game = Game()
+                            game.run()
                         elif self.cursor_y == self.mid_cursor:
                             #add feature here
                             print('leaderboard')
@@ -376,7 +373,8 @@ class Game:
         while self.game_run:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    self.game_run = False
+                    pg.quit()
+                    sys.exit()
                 if event.type == SCREEN_UPDATE:
                     self.update()
                 if event.type == pg.KEYDOWN:
@@ -386,6 +384,7 @@ class Game:
                         if event.key == pg.K_r:
                             self.game_over_menu = False
                             self.snake.reset()
+                            del self
                     if event.key == pg.K_RIGHT:
                         if self.snake.movement.x != -1:
                             self.snake.movement = v2(1, 0)
