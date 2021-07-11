@@ -5,7 +5,7 @@ import sys
 import random
 
 #to do -
-#fix uncentered text in game over menu
+#fix issue when score is displaying 0 after pressing button after game over
 #fix case for animation when in top right and left screen
 #add score, allow high score to be stored and loaded
 #move globals to another render class now when game menu class is being implemented
@@ -17,17 +17,6 @@ cell_number = 20
 font = pg.font.SysFont('timesnewroman', 32)
 font_menu = pg.font.SysFont('Raleway', 42, bold=True, italic=False)
 font_header = pg.font.SysFont('timesnewroman', 62, bold=True, italic=False)
-game_over_msg = f''
-game_over_msg2 = f'Press R to play again or Q to quit'
-text = font.render(game_over_msg, True, 
-    (255, 0, 0), (0, 0, 0))
-text2 = font.render(game_over_msg2, True, 
-        (255, 0, 0), (0, 0, 0))
-textRect = text.get_rect()
-textRect.center = (cell_number*cell_size / 2, cell_number*cell_size / 2)
-textRect2 = text2.get_rect()
-textRect2.midright = (cell_number*cell_size / 2 + 60, 
-        cell_number*cell_size / 2 + 100)
 board = pg.display.set_mode((cell_size * cell_number, 
     cell_size * cell_number))
 pg.display.set_caption('Snake by Tenos200')
@@ -310,9 +299,13 @@ class Food:
 class Game:
 
     def __init__(self):
+        self.game_over_msg = ''
+        self.game_over_msg2 = 'Press R to play again or Q to quit to menu'
         self.framerate = 60
         self.game_over_color = (0, 0, 0)
+        self.text_color = (255, 0, 0)
         self.bg_color = (175, 215, 75)
+        self.midpoint = cell_number*cell_size
         self.score = 0
         self.snake = Snake()
         self.food = Food()
@@ -354,18 +347,24 @@ class Game:
 
     def game_over(self):
         self.game_over_menu = True
-        self.display_message()
+        board.fill(self.game_over_color)
+        self.display_message(f'Game over! Score: {self.score}', 
+                self.text_color, self.game_over_color, 
+                self.midpoint,self.midpoint)
+        self.display_message('Press R to play again or Q to quit to menu.', 
+                self.text_color, self.game_over_color, 
+                self.midpoint+60,self.midpoint+200)
+
 
     def update_score(self):
         self.score+=1
 
-    def display_message(self):
-        game_over_msg = f'Game over! Score: {self.score}'
-        text = font.render(game_over_msg, True, 
-            (255, 0, 0), (0, 0, 0))
-        board.fill(self.game_over_color)
+    def display_message(self, msg, text_color, bg_color, x, y):
+        
+        text = font.render(msg, True, text_color, bg_color)
+        textRect = text.get_rect()
+        textRect.center = (x / 2, y / 2)
         board.blit(text, textRect)
-        board.blit(text2, textRect2)
         self.score = 0
     
     def run(self):
