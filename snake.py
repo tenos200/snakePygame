@@ -5,6 +5,7 @@ import sys
 import random
 
 #to do -
+#1.fix so that rankings is drawn properly when leaderboard is loaded!
 #fix issue when score is displaying 0 after pressing button after game over
 #fix case for animation when in top right and left screen
 #add score, allow high score to be stored and loaded
@@ -34,6 +35,7 @@ class Menu:
         self.top_cursor = cell_number*cell_size / 2  
         self.bottom_cursor = cell_number*cell_size / 2 + 120
         self.mid_cursor = cell_number*cell_size / 2 + 60
+        self.leaderboard = Leaderboard()
         self.move_down = 60
         self.move_up = -60
         self.menu_color = (175, 215, 75)
@@ -64,7 +66,7 @@ class Menu:
                             game.run()
                         elif self.cursor_y == self.mid_cursor:
                             #add feature here
-                            print('leaderboard')
+                            self.leaderboard.get_players()
                         elif self.cursor_y == self.bottom_cursor:
                             #add feature here
                             print('Help')
@@ -105,6 +107,55 @@ class Menu:
                 self.mid, self.mid + 60)
             self.draw_text(self.help_text,'Raleway', True, 42, 
                 self.mid, self.mid + 120)
+
+
+class Leaderboard:
+    #add leaderboard class here
+    def __init__(self):
+        self.text_color = (0, 0, 0)
+        self.menu_color = (175, 215, 75)
+        self.font_type = 'Raleway'
+        self.size = 32
+        self.x = cell_number*cell_size / 2 - 160
+        self.y = cell_number*cell_size / 2
+        board.fill(self.menu_color)
+
+    def get_players(self):
+        with open('rankings.txt') as ranking_file:
+            rankings = ranking_file.readlines()
+            swap = '' 
+            ranking_pos = 1
+
+            #work on better solution further on sorting
+            for i in range(len(rankings)):
+                name, score = rankings[i].split()
+                for j in range(len(rankings)):
+                    name2, score2 = rankings[j].split()
+                    if score < score2:
+                        swap = rankings[i]
+                        rankings[i] = rankings[j]
+                        rankings[j] = swap
+            rankings.reverse()
+
+            #not drawing properly
+            for i in rankings:
+                self.draw_leaderboard(self.y, ranking_pos, i)
+                ranking_pos+=1
+                self.y+=20
+
+
+
+    #not working currently
+    def draw_leaderboard(self, position, ranking, text):
+        fonts = pg.font.SysFont(self.font_type, self.size, False, italic=False)
+        display = fonts.render(text, True, (0, 0, 0), 
+                self.text_color)
+        display_rect  = display.get_rect()
+        display_rect.center = (self.x, position)
+        board.blit(display, display_rect)
+        pg.display.update()
+
+
 
 
 class Snake:
