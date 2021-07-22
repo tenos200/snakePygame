@@ -5,7 +5,7 @@ import sys
 import random
 
 #to do -
-#1.fix so that rankings is drawn properly when leaderboard is loaded!
+#fix so that ranking is centered properly when displayed
 #fix issue when score is displaying 0 after pressing button after game over
 #fix case for animation when in top right and left screen
 #add score, allow high score to be stored and loaded
@@ -35,7 +35,6 @@ class Menu:
         self.top_cursor = cell_number*cell_size / 2  
         self.bottom_cursor = cell_number*cell_size / 2 + 120
         self.mid_cursor = cell_number*cell_size / 2 + 60
-        self.leaderboard = Leaderboard()
         self.move_down = 60
         self.move_up = -60
         self.menu_color = (175, 215, 75)
@@ -66,7 +65,8 @@ class Menu:
                             game.run()
                         elif self.cursor_y == self.mid_cursor:
                             #add feature here
-                            self.leaderboard.get_players()
+                            leaderboard = Leaderboard()
+                            leaderboard.run_leaderboard()
                         elif self.cursor_y == self.bottom_cursor:
                             #add feature here
                             print('Help')
@@ -116,11 +116,33 @@ class Leaderboard:
         self.menu_color = (175, 215, 75)
         self.font_type = 'Raleway'
         self.size = 32
+        self.drawing = True
         self.x = cell_number*cell_size / 2 - 160
         self.y = cell_number*cell_size / 2
         board.fill(self.menu_color)
 
+
+    def run_leaderboard(self):
+
+        #method still not drawing
+        while self.drawing:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_q:
+                        self.drawing = False
+
+            self.get_players()
+            pg.display.update()
+            
+
+
+
+        
     def get_players(self):
+        board.fill(self.menu_color)
         with open('rankings.txt') as ranking_file:
             rankings = ranking_file.readlines()
             swap = '' 
@@ -143,17 +165,22 @@ class Leaderboard:
                 ranking_pos+=1
                 self.y+=20
 
+            self.y = cell_number*cell_size / 2
 
 
-    #not working currently
     def draw_leaderboard(self, position, ranking, text):
         fonts = pg.font.SysFont(self.font_type, self.size, False, italic=False)
-        display = fonts.render(text, True, (0, 0, 0), 
-                self.text_color)
-        display_rect  = display.get_rect()
+        display_text = fonts.render(text, True, self.text_color, 
+                self.menu_color)
+        display_rect  = display_text.get_rect()
         display_rect.center = (self.x, position)
-        board.blit(display, display_rect)
-        pg.display.update()
+        ranking = str(ranking) + '.'
+        display_ranking = fonts.render(ranking, True, self.text_color, 
+                self.menu_color)
+        display_ranking_rect = display_ranking.get_rect()
+        display_ranking_rect.center = (self.x - 80, position)
+        board.blit(display_text, display_rect)
+        board.blit(display_ranking, display_ranking_rect)
 
 
 
