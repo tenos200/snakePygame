@@ -5,10 +5,10 @@ import sys
 import random
 
 #to do -
-#fix so that ranking is centered properly when displayed
+#fix so that trailing square is not displayed in leaderboard text
+#add score, allow high score to be stored and loaded
 #fix issue when score is displaying 0 after pressing button after game over
 #fix case for animation when in top right and left screen
-#add score, allow high score to be stored and loaded
 #move globals to another render class now when game menu class is being implemented
 
 #globals to render
@@ -114,17 +114,22 @@ class Leaderboard:
     def __init__(self):
         self.text_color = (0, 0, 0)
         self.menu_color = (175, 215, 75)
+        self.size = 42
         self.font_type = 'Raleway'
-        self.size = 32
+        self.font_header = 'timesnewroman'
+        self.header = 'Leaderboard'
+        self.header_size = 62
         self.drawing = True
-        self.x = cell_number*cell_size / 2 - 160
+        self.x = cell_number*cell_size / 2 
         self.y = cell_number*cell_size / 2
+        self.y_ranking = cell_number*cell_size / 2
         board.fill(self.menu_color)
 
 
     def run_leaderboard(self):
-
         #method still not drawing
+        board.fill(self.menu_color)
+        self.draw_header()
         while self.drawing:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -138,11 +143,17 @@ class Leaderboard:
             pg.display.update()
             
 
-
+    def draw_header(self):
+        fonts = pg.font.SysFont(self.font_header, self.header_size, True,
+                italic=False)
+        header_text = fonts.render(self.header, True, self.text_color, 
+                self.menu_color)
+        header_rect = header_text.get_rect()
+        header_rect.center = (self.x, self.y - 200)
+        board.blit(header_text, header_rect)
 
         
     def get_players(self):
-        board.fill(self.menu_color)
         with open('rankings.txt') as ranking_file:
             rankings = ranking_file.readlines()
             swap = '' 
@@ -161,9 +172,9 @@ class Leaderboard:
 
             #not drawing properly
             for i in rankings:
-                self.draw_leaderboard(self.y, ranking_pos, i)
+                self.draw_leaderboard(self.y - 100, ranking_pos, i)
                 ranking_pos+=1
-                self.y+=20
+                self.y+=40
 
             self.y = cell_number*cell_size / 2
 
@@ -178,7 +189,7 @@ class Leaderboard:
         display_ranking = fonts.render(ranking, True, self.text_color, 
                 self.menu_color)
         display_ranking_rect = display_ranking.get_rect()
-        display_ranking_rect.center = (self.x - 80, position)
+        display_ranking_rect.center = (self.x - 100, position)
         board.blit(display_text, display_rect)
         board.blit(display_ranking, display_ranking_rect)
 
