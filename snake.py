@@ -5,7 +5,6 @@ import sys
 import random
 
 #to do -
-#fix so that trailing square is not displayed in leaderboard text
 #add score, allow high score to be stored and loaded
 #fix issue when score is displaying 0 after pressing button after game over
 #fix case for animation when in top right and left screen
@@ -51,7 +50,6 @@ class Menu:
                 self.cursor_y)
 
     def menu_run(self):
-
         while True:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -110,7 +108,7 @@ class Menu:
 
 
 class Leaderboard:
-    #add leaderboard class here
+
     def __init__(self):
         self.text_color = (0, 0, 0)
         self.menu_color = (175, 215, 75)
@@ -127,7 +125,6 @@ class Leaderboard:
 
 
     def run_leaderboard(self):
-        #method still not drawing
         board.fill(self.menu_color)
         self.draw_header()
         while self.drawing:
@@ -170,9 +167,13 @@ class Leaderboard:
                         rankings[j] = swap
             rankings.reverse()
 
-            #not drawing properly
-            for i in rankings:
-                self.draw_leaderboard(self.y - 100, ranking_pos, i)
+            #initalise new list to remove trailing '\n'
+            rankings_display = []
+            for x in rankings:
+                rankings_display.append(x.replace('\n', ''))
+
+            for text in rankings_display:
+                self.draw_leaderboard(self.y - 100, ranking_pos, text)
                 ranking_pos+=1
                 self.y+=40
 
@@ -449,15 +450,14 @@ class Game:
         self.score+=1
 
     def display_message(self, msg, text_color, bg_color, x, y):
-        
         text = font.render(msg, True, text_color, bg_color)
         textRect = text.get_rect()
         textRect.center = (x / 2, y / 2)
         board.blit(text, textRect)
         self.score = 0
-    
-    def run(self):
 
+
+    def run(self):
         while self.game_run:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
