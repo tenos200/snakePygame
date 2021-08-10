@@ -5,6 +5,8 @@ import sys
 import random
 
 #to do -
+#fix issue where score is always displayed as 0
+#create save method so that save the player and score in txt file
 #add score, allow high score to be stored and loaded
 #fix issue when score is displaying 0 after pressing button after game over
 #fix case for animation when in top right and left screen
@@ -385,7 +387,6 @@ class Food:
         self.vector = v2(self.x, self.y)
 
 
-
 class Game:
 
     def __init__(self):
@@ -456,6 +457,35 @@ class Game:
         board.blit(text, textRect)
         self.score = 0
 
+    def save_player(self, name, score):
+        #this method should be used to save the player score and name
+        print(f'{name} : {score}')
+        pass
+    
+    def enter_name(self):
+        #fix this thing 
+        writing = True
+        name = ''
+        #need to find a better solution for updating this value at first
+        board.fill(self.game_over_color)
+        self.display_message('Save as:',
+                self.text_color, self.game_over_color,
+                self.midpoint, self.midpoint)
+        pg.display.update()
+
+        while writing:
+            for event in pg.event.get():
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_RETURN:
+                        writing = False
+                    else:
+                        name = name + chr(event.key)
+                self.display_message(f'Save as: {name}',
+                        self.text_color, self.game_over_color,
+                        self.midpoint, self.midpoint)
+                pg.display.update()
+
+        return name
 
     def run(self):
         while self.game_run:
@@ -473,6 +503,9 @@ class Game:
                             self.game_over_menu = False
                             self.snake.reset()
                             del self
+                        if event.key == pg.K_s:
+                            name = self.enter_name()
+                            self.save_player(name, self.score)
                     if event.key == pg.K_RIGHT:
                         if self.snake.movement.x != -1:
                             self.snake.movement = v2(1, 0)
