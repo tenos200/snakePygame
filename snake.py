@@ -441,10 +441,16 @@ class Game:
         board.fill(self.game_over_color)
         self.display_message(f'Game over! Score: {self.score}', 
                 self.text_color, self.game_over_color, 
-                self.midpoint,self.midpoint)
-        self.display_message('Press R to play again or Q to quit to menu.', 
+                self.midpoint,self.midpoint-200)
+        self.display_message('Press R to play again', 
                 self.text_color, self.game_over_color, 
-                self.midpoint+60,self.midpoint+200)
+                self.midpoint,self.midpoint)
+        self.display_message('Press S to save player', 
+                self.text_color, self.game_over_color, 
+                self.midpoint,self.midpoint+150)
+        self.display_message('Press Q to quit.', 
+                self.text_color, self.game_over_color, 
+                self.midpoint,self.midpoint+300)
 
 
     def update_score(self):
@@ -463,7 +469,6 @@ class Game:
         pass
     
     def enter_name(self):
-        #fix this thing 
         writing = True
         name = ''
         #need to find a better solution for updating this value at first
@@ -477,12 +482,25 @@ class Game:
             for event in pg.event.get():
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_RETURN:
+                        self.display_message(f'{name} was saved to the leaderboard',
+                                self.text_color, self.game_over_color,
+                                self.midpoint, self.midpoint)
+                        self.display_message('Press R to play again or Q to quit to menu.', 
+                                self.text_color, self.game_over_color, 
+                                self.midpoint+60,self.midpoint+200)
                         writing = False
+                    elif event.key == pg.K_BACKSPACE:
+                        name = name[:-1]
+                        board.fill(self.game_over_color)
+                        pg.display.update()
+                        self.display_message(f'Save as: {name}',
+                                self.text_color, self.game_over_color,
+                                self.midpoint, self.midpoint)
                     else:
                         name = name + chr(event.key)
-                self.display_message(f'Save as: {name}',
-                        self.text_color, self.game_over_color,
-                        self.midpoint, self.midpoint)
+                        self.display_message(f'Save as: {name}',
+                                self.text_color, self.game_over_color,
+                                self.midpoint, self.midpoint)
                 pg.display.update()
 
         return name
@@ -504,8 +522,8 @@ class Game:
                             self.snake.reset()
                             del self
                         if event.key == pg.K_s:
-                            name = self.enter_name()
-                            self.save_player(name, self.score)
+                            saved_name = self.enter_name()
+                            self.save_player(saved_name, self.score)
                     if event.key == pg.K_RIGHT:
                         if self.snake.movement.x != -1:
                             self.snake.movement = v2(1, 0)
