@@ -5,11 +5,13 @@ import sys
 import random
 
 #to do -
-#create save method so that save the player and score in txt file
-#make sure that a player name cannot be saved if name is already stored
-#add score, allow high score to be stored and loaded
+#fix sorting on rankings (Leaderboard)
+#fix so that user cannot save with 0 score and no name
+#fix so score is displayed properly on leaderboard
+#allow high score be loaded from file(fix)
 #fix case for animation when in top right and left screen
 #move globals to another render class now when game menu class is being implemented
+#make a class out of all the reading and writing to files, as DataHandler class
 
 #globals to render
 pg.init()
@@ -194,7 +196,6 @@ class Leaderboard:
         display_ranking_rect.center = (self.x - 100, position)
         board.blit(display_text, display_rect)
         board.blit(display_ranking, display_ranking_rect)
-
 
 
 
@@ -460,10 +461,25 @@ class Game:
         textRect.center = (x / 2, y / 2)
         board.blit(text, textRect)
 
+
+
+    def check_name(self, name):
+        #first check if player has not been entered into file
+        with open('rankings.txt') as f:
+            rankings = f.readlines()
+        for i in range(len(rankings)):
+            player, score = rankings[i].split()
+            if player == name:
+                return True 
+
+        return False
+
     def save_player(self, name, score):
-        #this method should be used to save the player score and name
-        print(f'{name} : {score}')
-        pass
+        player_stats = name + ' '  + str(score) + '\n'
+        file1 = open('rankings.txt', "a")
+        file1.write(player_stats)
+        file1.close()
+
     
     def enter_name(self):
         writing = True
@@ -479,13 +495,26 @@ class Game:
             for event in pg.event.get():
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_RETURN:
-                        self.display_message(f'{name} was saved to the leaderboard',
-                                self.text_color, self.game_over_color,
-                                self.midpoint, self.midpoint)
-                        self.display_message('Press R to play again or Q to quit to menu.', 
-                                self.text_color, self.game_over_color, 
-                                self.midpoint+60,self.midpoint+200)
-                        writing = False
+                        name_exists = self.check_name(name)
+                        if name_exists:
+                            self.display_message('That name has already been saved.',
+                                    self.text_color, self.game_over_color,
+                                    self.midpoint, self.midpoint)
+                            pg.display.update()
+                            name = ''
+                            time.sleep(2)
+                            board.fill(self.game_over_color)
+                            self.display_message('Save as:',
+                                    self.text_color, self.game_over_color,
+                                    self.midpoint, self.midpoint)
+                        else:
+                            self.display_message(f'{name} was saved to the leaderboard',
+                                    self.text_color, self.game_over_color,
+                                    self.midpoint, self.midpoint)
+                            self.display_message('Press R to play again or Q to quit to menu.', 
+                                    self.text_color, self.game_over_color, 
+                                    self.midpoint+60,self.midpoint+200)
+                            writing = False
                     elif event.key == pg.K_BACKSPACE:
                         name = name[:-1]
                         board.fill(self.game_over_color)
@@ -493,7 +522,17 @@ class Game:
                         self.display_message(f'Save as: {name}',
                                 self.text_color, self.game_over_color,
                                 self.midpoint, self.midpoint)
-                    elif (event.key >= 65 and event.key <= 90) or (event.key >= 97 and event.key <= 122):
+                    elif event.key >= 48 and event.key <= 57:
+                        name = name + chr(event.key)
+                        self.display_message(f'Save as: {name}',
+                                self.text_color, self.game_over_color,
+                                self.midpoint, self.midpoint)
+                    elif event.key >= 65 and event.key <= 90:
+                        name = name + chr(event.key)
+                        self.display_message(f'Save as: {name}',
+                                self.text_color, self.game_over_color,
+                                self.midpoint, self.midpoint)
+                    elif event.key >= 97 and event.key <= 122:
                         name = name + chr(event.key)
                         self.display_message(f'Save as: {name}',
                                 self.text_color, self.game_over_color,
@@ -518,6 +557,7 @@ class Game:
                         if event.key == pg.K_r:
                             self.game_over_menu = False
                             self.snake.reset()
+                            #if this is removed then quiting works but it can loop somehow
                             del self
                         if event.key == pg.K_s:
                             saved_name = self.enter_name()
