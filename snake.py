@@ -5,9 +5,7 @@ import sys
 import random
 
 #to do -
-#fix sorting on rankings (Leaderboard)
 #fix so that user cannot save with 0 score and no name
-#fix so score is displayed properly on leaderboard
 #allow high score be loaded from file(fix)
 #fix case for animation when in top right and left screen
 #move globals to another render class now when game menu class is being implemented
@@ -65,7 +63,6 @@ class Menu:
                             game = Game()
                             game.run()
                         elif self.cursor_y == self.mid_cursor:
-                            #add feature here
                             leaderboard = Leaderboard()
                             leaderboard.run_leaderboard()
                         elif self.cursor_y == self.bottom_cursor:
@@ -124,6 +121,7 @@ class Leaderboard:
         self.x = cell_number*cell_size / 2 
         self.y = cell_number*cell_size / 2
         self.y_ranking = cell_number*cell_size / 2
+        self.data_handler = DataHandler()
         board.fill(self.menu_color)
 
 
@@ -162,12 +160,15 @@ class Leaderboard:
             #work on better solution further on sorting
             for i in range(len(rankings)):
                 name, score = rankings[i].split()
+                score = int(score)
                 for j in range(len(rankings)):
                     name2, score2 = rankings[j].split()
-                    if score < score2:
+                    score2 = int(score2)
+                    if (name != name2) and (score <= score2):
                         swap = rankings[i]
                         rankings[i] = rankings[j]
                         rankings[j] = swap
+
             rankings.reverse()
 
             #initalise new list to remove trailing '\n'
@@ -250,8 +251,6 @@ class Snake:
                 elif previous_block.y == next_block.y:
                     board.blit(self.body_horizontal, snake_rect)
                 else:
-                    #print(f'{previous_block.x} 
-                    #{previous_block.y} {next_block.x} {next_block.y}')
                     if previous_block.x == -1 and next_block.y == -1:
                         board.blit(self.body_tl, snake_rect)
                     elif previous_block.y == -1 and next_block.x == -1:
@@ -386,6 +385,27 @@ class Food:
         self.vector = v2(self.x, self.y)
 
 
+class DataHandler:
+    
+    def check_name(self, name):
+        #first check if player has not been entered into file
+        with open('rankings.txt') as f:
+            rankings = f.readlines()
+        for i in range(len(rankings)):
+            player, score = rankings[i].split()
+            if player == name:
+                return True 
+
+        return False
+
+    def save_player(self, name, score):
+        player_stats = name + ' '  + str(score) + '\n'
+        file1 = open('rankings.txt', "a")
+        file1.write(player_stats)
+        file1.close()
+
+
+
 class Game:
 
     def __init__(self):
@@ -399,6 +419,7 @@ class Game:
         self.score = 0
         self.snake = Snake()
         self.food = Food()
+        self.data_handler = DataHandler()
         self.game_over_menu = False 
         self.game_run = True
 
@@ -461,25 +482,6 @@ class Game:
         textRect.center = (x / 2, y / 2)
         board.blit(text, textRect)
 
-
-
-    def check_name(self, name):
-        #first check if player has not been entered into file
-        with open('rankings.txt') as f:
-            rankings = f.readlines()
-        for i in range(len(rankings)):
-            player, score = rankings[i].split()
-            if player == name:
-                return True 
-
-        return False
-
-    def save_player(self, name, score):
-        player_stats = name + ' '  + str(score) + '\n'
-        file1 = open('rankings.txt', "a")
-        file1.write(player_stats)
-        file1.close()
-
     
     def enter_name(self):
         writing = True
@@ -495,7 +497,7 @@ class Game:
             for event in pg.event.get():
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_RETURN:
-                        name_exists = self.check_name(name)
+                        name_exists = self.data_handler.check_name(name)
                         if name_exists:
                             self.display_message('That name has already been saved.',
                                     self.text_color, self.game_over_color,
@@ -561,7 +563,7 @@ class Game:
                             del self
                         if event.key == pg.K_s:
                             saved_name = self.enter_name()
-                            self.save_player(saved_name, self.score)
+                            self.data_handler.save_player(saved_name, self.score)
                             self.score = 0
                     if event.key == pg.K_RIGHT:
                         if self.snake.movement.x != -1:
