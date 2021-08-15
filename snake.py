@@ -3,6 +3,7 @@ from pygame.math import Vector2 as v2
 import time
 import sys
 import random
+import os.path
 
 #to do -
 #fix so that user cannot save with 0 score and no name
@@ -43,6 +44,7 @@ class Menu:
         self.play_text = 'Play'
         self.leaderboard_text = 'Leaderboard'
         self.help_text = 'Help'
+        self.file_name = 'rankings.txt'
         self.credits_text = 'Credits'
         self.mid = cell_number*cell_size / 2
         self.menu_cursor = font_menu.render('>', True, (0, 0, 0), self.menu_color)
@@ -50,7 +52,18 @@ class Menu:
         self.cursor_rect.center = (self.cursor_x, 
                 self.cursor_y)
 
+
+        
+    def create_file(self, file_name):
+        try:
+            with open(file_name) as f:
+        except IOError:
+            f = open(file_name, "w")
+            f.close()
+
+
     def menu_run(self):
+        self.create_file(self.file_name)
         while True:
             for event in pg.event.get():
                 if event.type == pg.QUIT:

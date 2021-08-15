@@ -1,6 +1,1 @@
-top 80
-medium 40
-best 240
-test 30
-lol 40
-max 150
+tim 80
