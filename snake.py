@@ -6,8 +6,10 @@ import random
 import os.path
 
 #to do -
+#only allow user to save a name with 12 characters not more.
+#move ranking numbers more to left
 #fix so that user cannot save with 0 score and no name
-#allow high score be loaded from file(fix)
+#fix issue with del self crashing program after many restarts
 #fix case for animation when in top right and left screen
 #move globals to another render class now when game menu class is being implemented
 #make a class out of all the reading and writing to files, as DataHandler class
@@ -57,6 +59,7 @@ class Menu:
     def create_file(self, file_name):
         try:
             with open(file_name) as f:
+                print(f)
         except IOError:
             f = open(file_name, "w")
             f.close()

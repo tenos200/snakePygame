@@ -1,1 +1,4 @@
 tim 80
+test1 0
+test2 140
+bestone11 500
