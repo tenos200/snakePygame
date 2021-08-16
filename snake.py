@@ -6,9 +6,8 @@ import random
 import os.path
 
 #to do -
-#only allow user to save a name with 12 characters not more.
-#move ranking numbers more to left
-#fix so that user cannot save with 0 score and no name
+#fix so that user cannot save with 0 score or no name
+#change text so that it indicates what are points better in the leaderboard
 #fix issue with del self crashing program after many restarts
 #fix case for animation when in top right and left screen
 #move globals to another render class now when game menu class is being implemented
@@ -210,7 +209,7 @@ class Leaderboard:
         display_ranking = fonts.render(ranking, True, self.text_color, 
                 self.menu_color)
         display_ranking_rect = display_ranking.get_rect()
-        display_ranking_rect.center = (self.x - 100, position)
+        display_ranking_rect.center = (self.x - 180, position)
         board.blit(display_text, display_rect)
         board.blit(display_ranking, display_ranking_rect)
 
@@ -428,6 +427,7 @@ class Game:
         self.game_over_msg = ''
         self.game_over_msg2 = 'Press R to play again or Q to quit to menu'
         self.framerate = 60
+        self.max_characters = 12
         self.game_over_color = (0, 0, 0)
         self.text_color = (255, 0, 0)
         self.bg_color = (175, 215, 75)
@@ -537,6 +537,10 @@ class Game:
                         name = name[:-1]
                         board.fill(self.game_over_color)
                         pg.display.update()
+                        self.display_message(f'Save as: {name}',
+                                self.text_color, self.game_over_color,
+                                self.midpoint, self.midpoint)
+                    elif len(name) >= self.max_characters:
                         self.display_message(f'Save as: {name}',
                                 self.text_color, self.game_over_color,
                                 self.midpoint, self.midpoint)
