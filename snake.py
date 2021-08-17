@@ -3,15 +3,14 @@ from pygame.math import Vector2 as v2
 import time
 import sys
 import random
-import os.path
 
 #to do -
-#fix so that user cannot save with 0 score or no name
-#change text so that it indicates what are points better in the leaderboard
 #fix issue with del self crashing program after many restarts
+#change text so that it indicates what are points better in the leaderboard
 #fix case for animation when in top right and left screen
 #move globals to another render class now when game menu class is being implemented
 #make a class out of all the reading and writing to files, as DataHandler class
+#make sure that the text and UI elements looks good
 
 #globals to render
 pg.init()
@@ -474,19 +473,31 @@ class Game:
 
     def game_over(self):
         self.game_over_menu = True
-        board.fill(self.game_over_color)
-        self.display_message(f'Game over! Score: {self.score}', 
-                self.text_color, self.game_over_color, 
-                self.midpoint,self.midpoint-200)
-        self.display_message('Press R to play again', 
-                self.text_color, self.game_over_color, 
-                self.midpoint,self.midpoint)
-        self.display_message('Press S to save player', 
-                self.text_color, self.game_over_color, 
+        if self.score == 0:
+            board.fill(self.game_over_color)
+            self.display_message(f'Game over!', 
+                    self.text_color, self.game_over_color, 
+                    self.midpoint,self.midpoint-200)
+            self.display_message('Press R to play again', 
+                    self.text_color, self.game_over_color, 
+                    self.midpoint,self.midpoint)
+            self.display_message('Press Q to quit.', 
+                    self.text_color, self.game_over_color, 
                 self.midpoint,self.midpoint+150)
-        self.display_message('Press Q to quit.', 
-                self.text_color, self.game_over_color, 
-                self.midpoint,self.midpoint+300)
+        else:
+            board.fill(self.game_over_color)
+            self.display_message(f'Game over! Score: {self.score}', 
+                    self.text_color, self.game_over_color, 
+                    self.midpoint,self.midpoint-200)
+            self.display_message('Press R to play again', 
+                    self.text_color, self.game_over_color, 
+                    self.midpoint,self.midpoint)
+            self.display_message('Press S to save player', 
+                    self.text_color, self.game_over_color, 
+                    self.midpoint,self.midpoint+150)
+            self.display_message('Press Q to quit.', 
+                    self.text_color, self.game_over_color, 
+                    self.midpoint,self.midpoint+300)
 
 
     def update_score(self):
@@ -500,8 +511,8 @@ class Game:
 
     
     def enter_name(self):
-        writing = True
         name = ''
+        writing = True
         #need to find a better solution for updating this value at first
         board.fill(self.game_over_color)
         self.display_message('Save as:',
@@ -512,7 +523,7 @@ class Game:
         while writing:
             for event in pg.event.get():
                 if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_RETURN:
+                    if event.key == pg.K_RETURN and name != '':
                         name_exists = self.data_handler.check_name(name)
                         if name_exists:
                             self.display_message('That name has already been saved.',
@@ -525,6 +536,7 @@ class Game:
                             self.display_message('Save as:',
                                     self.text_color, self.game_over_color,
                                     self.midpoint, self.midpoint)
+
                         else:
                             self.display_message(f'{name} was saved to the leaderboard',
                                     self.text_color, self.game_over_color,
@@ -581,7 +593,7 @@ class Game:
                             self.snake.reset()
                             #if this is removed then quiting works but it can loop somehow
                             del self
-                        if event.key == pg.K_s:
+                        if event.key == pg.K_s and self.score > 0:
                             saved_name = self.enter_name()
                             self.data_handler.save_player(saved_name, self.score)
                             self.score = 0
