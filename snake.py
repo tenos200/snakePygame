@@ -5,12 +5,11 @@ import sys
 import random
 
 #to do -
-#fix issue with del self crashing program after many restarts
-#change text so that it indicates what are points better in the leaderboard
 #fix case for animation when in top right and left screen
 #move globals to another render class now when game menu class is being implemented
 #make a class out of all the reading and writing to files, as DataHandler class
 #make sure that the text and UI elements looks good
+#add help menu as a class
 
 #globals to render
 pg.init()
@@ -130,6 +129,8 @@ class Leaderboard:
         self.font_type = 'Raleway'
         self.font_header = 'timesnewroman'
         self.header = 'Leaderboard'
+        self.apple_graphic = pg.image.load(
+                'graphics/apple.png').convert_alpha()
         self.header_size = 62
         self.drawing = True
         self.x = cell_number*cell_size / 2 
@@ -191,25 +192,40 @@ class Leaderboard:
                 rankings_display.append(x.replace('\n', ''))
 
             for text in rankings_display:
-                self.draw_leaderboard(self.y - 100, ranking_pos, text)
+                name, score = text.split()
+                self.draw_leaderboard(self.y - 100, ranking_pos, name, score)
                 ranking_pos+=1
                 self.y+=40
 
             self.y = cell_number*cell_size / 2
 
 
-    def draw_leaderboard(self, position, ranking, text):
+    def draw_leaderboard(self, position, ranking, name, score):
+        #render for name
         fonts = pg.font.SysFont(self.font_type, self.size, False, italic=False)
-        display_text = fonts.render(text, True, self.text_color, 
+        display_name = fonts.render(name, True, self.text_color, 
                 self.menu_color)
-        display_rect  = display_text.get_rect()
-        display_rect.center = (self.x, position)
+        display_name_rect  = display_name.get_rect()
+        display_name_rect.center = (self.x, position)
+        #render for score
+        fonts = pg.font.SysFont(self.font_type, self.size, False, italic=False)
+        display_score = fonts.render(score, True, self.text_color, 
+                self.menu_color)
+        display_score_rect  = display_score.get_rect()
+        display_score_rect.center = (self.x + 200, position)
+        #render for ranking
         ranking = str(ranking) + '.'
         display_ranking = fonts.render(ranking, True, self.text_color, 
                 self.menu_color)
         display_ranking_rect = display_ranking.get_rect()
-        display_ranking_rect.center = (self.x - 180, position)
-        board.blit(display_text, display_rect)
+        display_ranking_rect.center = (self.x - 280, position)
+        #render for apple icon
+        apple_score_rect = pg.Rect(self.x + 220, position - 20, 
+                cell_size, cell_size)
+
+        board.blit(display_name, display_name_rect)
+        board.blit(display_score, display_score_rect)
+        board.blit(self.apple_graphic, apple_score_rect)
         board.blit(display_ranking, display_ranking_rect)
 
 
@@ -375,10 +391,8 @@ class Snake:
         self.grow = True
 
     def reset(self):
-        self.body = [v2(6, 10), v2(5, 10)]
-        self.movement = v2(0, 0)
-        game = Game()
-        game.run()
+        self.body = [v2(6, 10), v2(5, 10), v2(4, 10)]
+        self.movement = v2(1, 0)
         
 
 class Food:
@@ -501,7 +515,7 @@ class Game:
 
 
     def update_score(self):
-        self.score+=10
+        self.score+=1
 
     def display_message(self, msg, text_color, bg_color, x, y):
         text = font.render(msg, True, text_color, bg_color)
@@ -591,8 +605,6 @@ class Game:
                         if event.key == pg.K_r:
                             self.game_over_menu = False
                             self.snake.reset()
-                            #if this is removed then quiting works but it can loop somehow
-                            del self
                         if event.key == pg.K_s and self.score > 0:
                             saved_name = self.enter_name()
                             self.data_handler.save_player(saved_name, self.score)
