@@ -5,11 +5,11 @@ import sys
 import random
 
 #to do -
-#fix case for animation when in top right and left screen
 #move globals to another render class now when game menu class is being implemented
 #make a class out of all the reading and writing to files, as DataHandler class
 #make sure that the text and UI elements looks good
 #add help menu as a class
+#remove all the magic numbers and replace with stuff that makes sense
 
 #globals to render
 pg.init()
@@ -281,9 +281,12 @@ class Snake:
                 elif previous_block.y == next_block.y:
                     board.blit(self.body_horizontal, snake_rect)
                 else:
+                    #print(f'{previous_block.x} {previous_block.y} {next_block.x} {next_block.y}')
                     if previous_block.x == -1 and next_block.y == -1:
                         board.blit(self.body_tl, snake_rect)
                     elif previous_block.y == -1 and next_block.x == -1:
+                        board.blit(self.body_tl, snake_rect)
+                    elif previous_block.y == 19 and next_block.x == 19:
                         board.blit(self.body_tl, snake_rect)
                     elif previous_block.x == 19 and next_block.y == -1:
                         board.blit(self.body_tl, snake_rect)
@@ -293,12 +296,18 @@ class Snake:
                         board.blit(self.body_tl, snake_rect)
                     elif next_block.x == -1 and previous_block.y == 19:
                         board.blit(self.body_tl, snake_rect)
+                    elif previous_block.x == 19 and next_block.y == 19:
+                        board.blit(self.body_tl, snake_rect)
 
-                    elif previous_block.x == -1 and next_block.y == 1:
-                        board.blit(self.body_bl, snake_rect)
                     elif previous_block.y == 1 and next_block.x == -1:
                         board.blit(self.body_bl, snake_rect)
+                    elif previous_block.y == -19 and next_block.x == 19:
+                        board.blit(self.body_bl, snake_rect)
+                    elif previous_block.x == -1 and next_block.y == 1:
+                        board.blit(self.body_bl, snake_rect)
                     elif previous_block.x == -1 and next_block.y == -19:
+                        board.blit(self.body_bl, snake_rect)
+                    elif previous_block.x == 19 and next_block.y == -19:
                         board.blit(self.body_bl, snake_rect)
                     elif previous_block.x == 19 and next_block.y == 1:
                         board.blit(self.body_bl, snake_rect)
@@ -306,29 +315,37 @@ class Snake:
                         board.blit(self.body_bl, snake_rect)
                     elif next_block.x == -1 and previous_block.y == -19:
                         board.blit(self.body_bl, snake_rect)
-
-                    elif previous_block.x == 1 and next_block.y == -1:
-                        board.blit(self.body_tr, snake_rect)
+                    
                     elif previous_block.y == -1 and next_block.x == 1:
+                        board.blit(self.body_tr, snake_rect)
+                    elif previous_block.y == 19 and next_block.x == -19:
                         board.blit(self.body_tr, snake_rect)
                     elif previous_block.x == 1 and next_block.y == 19:
                         board.blit(self.body_tr, snake_rect)
-                    elif next_block.x == 1 and previous_block.y == 19:
+                    elif previous_block.x == 1 and next_block.y == -1:
+                        board.blit(self.body_tr, snake_rect)
+                    elif previous_block.x == -19 and next_block.y == 19:
                         board.blit(self.body_tr, snake_rect)
                     elif previous_block.x == -19 and next_block.y == -1:
                         board.blit(self.body_tr, snake_rect)
+                    elif next_block.x == 1 and previous_block.y == 19:
+                        board.blit(self.body_tr, snake_rect)
                     elif next_block.x == -19 and previous_block.y == -1:
                         board.blit(self.body_tr, snake_rect)
-                    
-                    elif previous_block.x == 1 and next_block.y == 1:
-                        board.blit(self.body_br, snake_rect)
+
                     elif previous_block.y == 1 and next_block.x == 1:
+                        board.blit(self.body_br, snake_rect)
+                    elif previous_block.y == -19 and next_block.x == -19:
+                        board.blit(self.body_br, snake_rect)
+                    elif previous_block.x == 1 and next_block.y == 1:
                         board.blit(self.body_br, snake_rect)
                     elif previous_block.x == 1 and next_block.y == -19:
                         board.blit(self.body_br, snake_rect)
                     elif previous_block.x == -19 and next_block.y == 1:
                         board.blit(self.body_br, snake_rect)
                     elif next_block.x == -19 and previous_block.y == 1:
+                        board.blit(self.body_br, snake_rect)
+                    elif previous_block.x == -19 and next_block.y == -19:
                         board.blit(self.body_br, snake_rect)
                     elif next_block.x == 1 and previous_block.y == -19:
                         board.blit(self.body_br, snake_rect)
