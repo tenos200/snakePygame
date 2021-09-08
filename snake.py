@@ -5,10 +5,11 @@ import sys
 import random
 
 #to do -
+#add help menu as a class
+#move graphics and ranking files to dot file format.
 #move globals to another render class now when game menu class is being implemented
 #make a class out of all the reading and writing to files, as DataHandler class
 #make sure that the text and UI elements looks good
-#add help menu as a class
 #remove all the magic numbers and replace with stuff that makes sense
 
 #globals to render
@@ -77,10 +78,10 @@ class Menu:
                             game.run()
                         elif self.cursor_y == self.mid_cursor:
                             leaderboard = Leaderboard()
-                            leaderboard.run_leaderboard()
+                            leaderboard.run()
                         elif self.cursor_y == self.bottom_cursor:
-                            #add feature here
-                            print('Help')
+                            helpmenu = HelpMenu()
+                            helpmenu.run()
                     elif event.key == pg.K_UP:
                         if self.cursor_y == self.top_cursor:
                             self.cursor_y = self.bottom_cursor
@@ -140,7 +141,7 @@ class Leaderboard:
         board.fill(self.menu_color)
 
 
-    def run_leaderboard(self):
+    def run(self):
         board.fill(self.menu_color)
         self.draw_header()
         while self.drawing:
@@ -151,7 +152,6 @@ class Leaderboard:
                 elif event.type == pg.KEYDOWN:
                     if event.key == pg.K_q:
                         self.drawing = False
-
             self.get_players()
             pg.display.update()
             
@@ -229,6 +229,60 @@ class Leaderboard:
         board.blit(display_ranking, display_ranking_rect)
 
 
+class HelpMenu:
+
+    def __init__(self):
+        self.text_color = (0, 0, 0)
+        self.menu_color = (175, 215, 75)
+        self.size = 42
+        self.font_type = 'Raleway'
+        self.font_header = 'timesnewroman'
+        self.header = 'Controls'
+        self.arrow_up = pg.image.load(
+                'graphics/up_arrow.png').convert_alpha()
+        self.arrow_down = pg.image.load(
+                'graphics/down_arrow.png').convert_alpha()
+        self.arrow_right = pg.image.load(
+                'graphics/right_arrow.png').convert_alpha()
+        self.arrow_left = pg.image.load(
+                'graphics/left_arrow.png').convert_alpha()
+        self.header_size = 62
+        self.drawing = True
+        self.x = cell_number*cell_size / 2 
+        self.y = cell_number*cell_size / 2
+        self.y_ranking = cell_number*cell_size / 2
+
+    def run(self):
+        board.fill(self.menu_color)
+        self.draw_header()
+        while self.drawing:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_q:
+                        self.drawing = False
+            self.test_draw()
+            pg.display.update()
+    
+
+    #sort these methods to display all controls
+    def draw_header(self):
+        fonts = pg.font.SysFont(self.font_header, self.header_size, True,
+                italic=False)
+        header_text = fonts.render(self.header, True, self.text_color, 
+                self.menu_color)
+        header_rect = header_text.get_rect()
+        header_rect.center = (self.x, self.y - 200)
+        board.blit(header_text, header_rect)
+    
+    def test_draw(self):
+        right_arrow_rect = pg.Rect(self.x + 220, self.y - 20, 
+                cell_size, cell_size)
+        board.blit(self.arrow_up, right_arrow_rect)
+
+
 
 class Snake:
 
@@ -237,7 +291,7 @@ class Snake:
         self.movement = v2(1, 0)
         self.grow = False
 
-        #grahpics from clear code tutorial
+        #graphics from clear code tutorial
         self.head_up = pg.image.load('graphics/head_up.png').convert_alpha()
         self.head_down = pg.image.load('graphics/head_down.png').convert_alpha()
         self.head_right = pg.image.load('graphics/head_right.png').convert_alpha()
@@ -262,7 +316,7 @@ class Snake:
 
     def draw_snake(self):
         self.update_head_graphics()
-        self.update_tail_grahpics()
+        self.update_tail_graphics()
 
         for index, block in enumerate(self.body):
             snake_rect = pg.Rect(block.x * cell_size, block.y * cell_size, 
@@ -384,7 +438,7 @@ class Snake:
             self.head = self.head_up
 
 
-    def update_tail_grahpics(self):
+    def update_tail_graphics(self):
         tail_relation = self.body[-2] - self.body[-1]
 
         if tail_relation == v2(0, 19):
