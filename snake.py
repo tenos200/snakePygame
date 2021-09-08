@@ -255,6 +255,7 @@ class HelpMenu:
     def run(self):
         board.fill(self.menu_color)
         self.draw_header()
+        self.draw_elements()
         while self.drawing:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -263,7 +264,6 @@ class HelpMenu:
                 elif event.type == pg.KEYDOWN:
                     if event.key == pg.K_q:
                         self.drawing = False
-            self.test_draw()
             pg.display.update()
     
 
@@ -277,7 +277,7 @@ class HelpMenu:
         header_rect.center = (self.x, self.y - 200)
         board.blit(header_text, header_rect)
     
-    def test_draw(self):
+    def draw_elements(self):
         right_arrow_rect = pg.Rect(self.x + 220, self.y - 20, 
                 cell_size, cell_size)
         board.blit(self.arrow_up, right_arrow_rect)
