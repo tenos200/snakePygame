@@ -27,7 +27,6 @@ SCREEN_UPDATE = pg.USEREVENT
 speed = 120
 pg.time.set_timer(SCREEN_UPDATE, speed)
 
-
 class Menu:
 
     def __init__(self):
@@ -44,7 +43,7 @@ class Menu:
         self.play_text = 'Play'
         self.leaderboard_text = 'Leaderboard'
         self.help_text = 'Help'
-        self.file_name = 'rankings.txt'
+        self.file_name = '.rankings.txt'
         self.credits_text = 'Credits'
         self.mid = cell_number*cell_size / 2
         self.menu_cursor = font_menu.render('>', True, (0, 0, 0), self.menu_color)
@@ -167,7 +166,7 @@ class Leaderboard:
 
         
     def get_players(self):
-        with open('rankings.txt') as ranking_file:
+        with open('.rankings.txt') as ranking_file:
             rankings = ranking_file.readlines()
             swap = '' 
             ranking_pos = 1
@@ -235,6 +234,15 @@ class HelpMenu:
         self.text_color = (0, 0, 0)
         self.menu_color = (175, 215, 75)
         self.size = 42
+        self.position_one = -100
+        self.position_two = 0 
+        self.position_three = 100
+        self.position_four = 200
+        self.position_offset = 180
+        self.position_one_text = self.position_one + 20
+        self.position_two_text = self.position_two+ 20
+        self.position_three_text = self.position_three + 20
+        self.position_four_text = self.position_four + 20
         self.font_type = 'Raleway'
         self.font_header = 'timesnewroman'
         self.header = 'Controls'
@@ -247,6 +255,10 @@ class HelpMenu:
         self.arrow_left = pg.image.load(
                 'graphics/left_arrow.png').convert_alpha()
         self.header_size = 62
+        self.arrow_up_text = 'Move up' 
+        self.arrow_down_text = 'Move down' 
+        self.arrow_right_text = 'Move right' 
+        self.arrow_left_text = 'Move left' 
         self.drawing = True
         self.x = cell_number*cell_size / 2 
         self.y = cell_number*cell_size / 2
@@ -266,8 +278,14 @@ class HelpMenu:
                         self.drawing = False
             pg.display.update()
     
+    def draw_text(self, text, font_type, bold, size, x, y):
+        fonts = pg.font.SysFont(font_type, size, bold, italic=False)
+        display = fonts.render(text, True, (0, 0, 0), 
+                self.menu_color)
+        display_rect  = display.get_rect()
+        display_rect.center = (x, y)
+        board.blit(display, display_rect)
 
-    #sort these methods to display all controls
     def draw_header(self):
         fonts = pg.font.SysFont(self.font_header, self.header_size, True,
                 italic=False)
@@ -278,10 +296,31 @@ class HelpMenu:
         board.blit(header_text, header_rect)
     
     def draw_elements(self):
-        right_arrow_rect = pg.Rect(self.x + 220, self.y - 20, 
+        #draw text in help menu
+        self.draw_text(self.arrow_up_text, self.font_type, False, self.size, self.x, self.y + self.position_one_text) 
+        self.draw_text(self.arrow_down_text, self.font_type, False, self.size, self.x ,self.y + self.position_two_text) 
+        self.draw_text(self.arrow_right_text, self.font_type, False, self.size, self.x, self.y + self.position_three_text) 
+        self.draw_text(self.arrow_left_text, self.font_type, False, self.size, self.x, self.y + self.position_four_text) 
+        #draw arrow elements
+        up_arrow_rect = pg.Rect(self.x + self.position_offset, 
+                self.y + self.position_one, 
                 cell_size, cell_size)
-        board.blit(self.arrow_up, right_arrow_rect)
-
+        up_arrow_rect_text = pg.Rect(self.x + self.position_offset,
+                self.y + self.position_one,
+                cell_size, cell_size)
+        down_arrow_rect = pg.Rect(self.x + self.position_offset, 
+                self.y + self.position_two, 
+                cell_size, cell_size)
+        right_arrow_rect = pg.Rect(self.x + self.position_offset, 
+                self.y + self.position_three, 
+                cell_size, cell_size)
+        left_arrow_rect = pg.Rect(self.x + self.position_offset, 
+                self.y + self.position_four, 
+                cell_size, cell_size)
+        board.blit(self.arrow_up, up_arrow_rect)
+        board.blit(self.arrow_down, down_arrow_rect)
+        board.blit(self.arrow_right, right_arrow_rect)
+        board.blit(self.arrow_left, left_arrow_rect)
 
 
 class Snake:
@@ -488,7 +527,7 @@ class DataHandler:
     
     def check_name(self, name):
         #first check if player has not been entered into file
-        with open('rankings.txt') as f:
+        with open('.rankings.txt') as f:
             rankings = f.readlines()
         for i in range(len(rankings)):
             player, score = rankings[i].split()
@@ -499,7 +538,7 @@ class DataHandler:
 
     def save_player(self, name, score):
         player_stats = name + ' '  + str(score) + '\n'
-        file1 = open('rankings.txt', "a")
+        file1 = open('.rankings.txt', "a")
         file1.write(player_stats)
         file1.close()
 
